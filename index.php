@@ -10,7 +10,7 @@ and open the template in the editor.
         <title></title>
     </head>
     <body>
-        <h1>Edit from sangwa</h1>
+        <h1>Edit from sangwa so Great</h1>
         <h2>Repply from Jules</h2>
         <h2>Repply from bojos</h2>
         <?php
