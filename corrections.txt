@@ -1,0 +1,23 @@
+corrections from the presentation on 24th April 2018
+----------------------------------------------------
+
+1.depatments of the company are: finance, procurement
+2. agronome will be in charge of agriculture
+3. accountant will take care of balance sheet, income statement, can't change some tasks.
+4. Agronome will quantify the required materils.
+5. procurement will set prices of the required materials, 
+6. logistics will add bought items in the system.
+7. the budget (planned) is closed based on the time period that the company had set
+8. there should be a report of expenses group by project type and printable
+9. account should be grouped in classes
+10.  show a title on homepage "MMC REPORTING SYS." on every page after login (dashboard)
+11. change the title on homepage (login)
+12. Stock system should be there too.
+
+
+
+bring back the amount in the general ledger
+bring back the memo
+
+go back to work on the general ledger, cost of goods sold 
+(as account category, not as the calculation)

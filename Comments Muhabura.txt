@@ -1,0 +1,77 @@
+
+journal should be highlighted
+the side menu should stay open(--done)
+id number and TIN should be added on the supplier.php
+the auto pop up should not be there.
+general ledger should be included (--done)
+alert of save should be there whether you want to save  or not you want to save
+"add new " should be removed accordingly( --done)
+add the income statement on the left bar(home page)(--done)
+
+report
+the report should group the revenues by project, administrative
+the report should group the expenses by projects, administrative
+
+the tax  
+
+the account payable should be separated from account receivable(--done)
+The logo on the top left should also include the title of MUHABUTA MMC(--done)
+The logo also on the top left should be set in the center(--done)
+The amount should be calculated automatically on "sales registration"(--done)
+Add tax on the sales quotation.php and balance of amount deducted tax.(--done)
+The amount should come back (autofilled in the textfields) on sales order(--done)
+the user on the sales invoice should be names instead of number(--done)
+the date in the record should show the record time.(--done)
+The delete and update column should be removed and be place in the registration(-done)
+The m2 should not appear in al combobox (on p_request.php)
+The error found on p_request.php while saving(--done)
+The apporove button sholuld appear on the bottom, "purchase order.php"(--done)
+search the budget preparation by project (e.g.: tea).
+there should be the stock management system.(--done)
+the purchase invoice and sales invoice should identify the number (not limited to any digit number)
+The description should have a bigger space
+add "LTD" on the welcome page and correct the word "multi-choice" as "multi choice"--(done)
+On every invoice there should be the payment method (cheque no. or cash)
+
+Every site has a stock that can easily be monitored on the system (as they take in and out).
+
+the smaller stock keeper should have means of requesting  materials he needs
+
+
+remove accounts
+--------------------------------
+
+=>filter the budget preparation
+=>Allow a user to change his credentials right after logging in
+=>
+TABLES TO REMOVE
+
+=>Contact(--doone)
+=>item
+=>item_category
+=>item_group
+
+
+---Comments on MUHABURA On 12 June with Afande
+  -----------------------------------------------
+=>view details(projects, activities) by clicking the main budget line
+=>Each activity also should have the amount (in budgeting)
+=>Add title of Income statement on top
+=>Show the items by =>project=>budget line
+=>Add a field (of budget line on the supplier), to know that a supplier is for agriculture
+      and that if you go to "puchace invoice" you find supplier by budget line
+=>Add search for supplier (names). the search result should show what a supplier supplies.
+=>Add item while selecting the purchase order (in purchase_invoice.php )
+=>Add total before saving on the purchase_invoice.php
+=>Increase data type on sales
+=>On payment voucher there should be: Done by, Verified by and Approved by and also account
+
+
+
+
+=>the account
+income tax
+
+
+On 1 August 2018
+
