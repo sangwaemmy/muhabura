@@ -32,12 +32,22 @@
             $purchase_order = trim($_POST['txt_purchase_order_id']);
             $activity = trim($_POST['txt_activity_id']);
             $account = trim($_POST['txt_account_id']);
+            $account1 = trim($_POST['acc_name_combo1']);
             $supplier = trim($_POST['txt_supplier_id']);
             $tot = $unit_cost * $quantity;
             require_once '../web_db/new_values.php';
             $obj = new new_values();
             $tax_inclusive = (filter_input(INPUT_POST, 'chk_tax_inc')) ? 'yes' : 'no';
             $obj->new_purchase_invoice_line($entry_date, $User, $quantity, $unit_cost, filter_var($tot, FILTER_SANITIZE_NUMBER_INT), $purchase_order, $activity, $account, $supplier, $tax_inclusive);
+           
+           
+
+         //  $obj->new_journal_entry_line($account, 'Debit',$tot, 'purchase invoice' 0, $entry_date);
+         
+           $obj->new_journal_entry_line($account,'Debit', $tot, 'purchase invoice', 0, $entry_date);
+            $obj->new_journal_entry_line($account1,'Credit', $tot, 'purchase invoice', 0, $entry_date);
+
+
 //            now save the account payable in the journal;
             $obj->new_journal_entry_line($account, 'Debit', $tot, "Invoice out", 0, date('y-m-d'));
             if (!empty($tax_inclusive)) {
@@ -165,7 +175,9 @@
                 <input type="hidden"  id="txt_p_type_project_id"    name="txt_type_project_id"/>
                 <table class="new_data_table off rehide">
                     <tr><td class="new_data_tb_frst_cols">Supplier </td><td> <?php get_supplier_combo(); ?>  </td></tr>
-                    <tr><td class="new_data_tb_frst_cols">Account </td><td> <?php get_account_combo(); ?>  </td></tr>
+                    <tr><td class="new_data_tb_frst_cols">Debit Account </td><td> <?php get_account_combo(); ?>  </td></tr>
+                   <tr><td class="new_data_tb_frst_cols"> Credit Account</td><td> <?php get_account_combo1(); ?>  </td></tr>
+
                     <tr><td class="new_data_tb_frst_cols"><label for="chk_tax_inc">Is tax inclusive</label> </td><td> <input type="checkbox"id="chk_tax_inc" name="chk_tax_inc" />  </td></tr>
                     <tr style="display: none;" class="perc_row off">
                         <td>percentage</td><td><input type="text" class="textbox txt_prec" name="txt_percentage" />  </td>
@@ -271,6 +283,11 @@
         $obj = new multi_values();
         $obj->get_account_in_combo_enabled_payable();
     }
+    function get_account_combo1() {
+        $obj = new multi_values();
+        $obj->get_account_in_combo_ac_credit();
+    }
+
 
     function get_purchase_order_line() {
         require_once '../web_db/other_fx.php';

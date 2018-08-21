@@ -46,6 +46,7 @@ $(document).ready(function () {
         show_alerts();
         financial_details();
         Retrieve_date();
+        cbo_rep_period();
         //        hide_footer();
     } catch (err) {
         alert(err.message);
@@ -114,7 +115,6 @@ function navigation() {
         balance_sheet();
         projects();
         get_cbo_acc_rec_accid();
-        cbo_rep_period();
 
     } catch (err) {
         alert(err.message);
@@ -867,7 +867,7 @@ function financial_details() {
             fin_res = data;
         }).complete(function () {
             $('.load_gif').hide(5, function () {
-                $('.fin_data_res').html(fin_res);
+                $('.fin_data_res  ').html(fin_res);
             });
         });
     });
@@ -1222,7 +1222,6 @@ function Retrieve_date() {//this is tp ge the date present in the textboxes once
         } else if (bind == 'cshfl') {//This is the cash flow
             the_rep_dates = 'cash';
         }
-
         $.post('handler_report.php', {the_rep_dates: the_rep_dates, date1: date1, date2: date2}, function (data) {
 //            alert('The dates changed: ' + data);
         }).complete(function () {
@@ -1233,8 +1232,6 @@ function Retrieve_date() {//this is tp ge the date present in the textboxes once
 
     });
 }
-
-
 function cbo_rep_period(){//cm
     $('.cbo_rep_period_options').change(function(){
        var item=$(this,'option:selected').val().trim();
@@ -1243,7 +1240,6 @@ function cbo_rep_period(){//cm
        if (item='Today') {
             $.post('handler_report.php', {rep_date_cbo: rep_date_cbo}, function (data) {
 //            alert('The dates changed: ' + data);
-               alert(data);
                
            }).complete(function () {
                 window.location.reload();
@@ -1254,9 +1250,8 @@ function cbo_rep_period(){//cm
 
     });
 }
-
 //</editor-fold>
-  
+
 
 
 
