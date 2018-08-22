@@ -6,17 +6,19 @@
      * SANGWA 
      */
 
- if (filter_has_var(INPUT_POST, 'rep_date_cbo')) {
+
+   if (filter_has_var(INPUT_POST, 'rep_date_cbo')) {
         require_once '../web_db/Reports.php';
         $obj = new Reports();
         $min_date = date("Y-m-d");
         $max_date =  date("Y-m-d");;
         $_SESSION['min_date'] = $min_date;
         $_SESSION['max_date'] = $max_date;
-          echo $_SESSION['min_date'].'   '.$_SESSION['max_date'];
+        echo $_SESSION['min_date'];    
 
    }
 
+ 
 
     if (filter_has_var(INPUT_POST, 'report_item_stock')) {
         require_once '../web_db/Reports.php';
@@ -90,8 +92,8 @@
 
     if (filter_has_var(INPUT_POST, 'the_rep_dates')) {
         $the_rep_dates = filter_input(INPUT_POST, 'the_rep_dates');
-        $_SESSION['rep_min_date'] = filter_input(INPUT_POST, 'date1');
-        $_SESSION['rep_max_date'] = filter_input(INPUT_POST, 'date2');
+        $_SESSION['min_date'] = filter_input(INPUT_POST, 'date1');
+        $_SESSION['max_date'] = filter_input(INPUT_POST, 'date2');
 
         //Lest us just verigy of the dates are well received
         echo 'The date 1 is ' . $_SESSION['rep_min_date'] . '  and the date 2 is: ' . $_SESSION['rep_max_date'];
@@ -310,6 +312,7 @@
         $max_date = $other->get_this_year_end_date();
         $other->list_sum_income_or_expenses('income');
     }
+
     if (filter_has_var(INPUT_POST, 'balnc_cogs')) {
         require_once '../web_db/multi_values.php';
         require_once '../web_db/other_fx.php';
@@ -396,3 +399,15 @@
     if (filter_has_var(INPUT_POST, 'full_book_cashflow')) {
         
     }
+    if (filter_has_var(INPUT_POST, 'the_rep_check')) {
+            require_once '../web_db/Reports.php';
+            require_once '../web_db/other_fx.php';
+            $other = new other_fx();
+            $rep = new Reports();
+            $date1=filter_input(INPUT_POST, 'date1').trim();
+
+            $date2= filter_input(INPUT_POST, 'date2').trim();
+            echo  $other->get_sum_income_or_expenses('income',$date1,$date2);
+
+    }
+ 
