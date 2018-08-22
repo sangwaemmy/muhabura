@@ -5,19 +5,6 @@
      *
      * SANGWA 
      */
-
- if (filter_has_var(INPUT_POST, 'rep_date_cbo')) {
-        require_once '../web_db/Reports.php';
-        $obj = new Reports();
-        $min_date = date("Y-m-d");
-        $max_date =  date("Y-m-d");;
-        $_SESSION['min_date'] = $min_date;
-        $_SESSION['max_date'] = $max_date;
-          echo $_SESSION['min_date'].'   '.$_SESSION['max_date'];
-
-   }
-
-
     if (filter_has_var(INPUT_POST, 'report_item_stock')) {
         require_once '../web_db/Reports.php';
         $obj = new Reports();
@@ -90,6 +77,7 @@
 
     if (filter_has_var(INPUT_POST, 'the_rep_dates')) {
         $the_rep_dates = filter_input(INPUT_POST, 'the_rep_dates');
+
         $_SESSION['rep_min_date'] = filter_input(INPUT_POST, 'date1');
         $_SESSION['rep_max_date'] = filter_input(INPUT_POST, 'date2');
 
@@ -204,7 +192,7 @@
     }
 
 
-    if (filter_has_var(INPUT_POST, 'inc_other_c_assets')) {
+     if (filter_has_var(INPUT_POST, 'inc_other_c_assets')) {
         require_once '../web_db/multi_values.php';
         require_once '../web_db/other_fx.php';
         $obj = new multi_values();
@@ -363,7 +351,9 @@
         $other = new other_fx();
         $min_date = $other->get_this_year_start_date();
         $max_date = $other->get_this_year_end_date();
+        $other->list_interest_income_by_date($min_date, $max_date);
     }
+    // Update from bojos 
     if (filter_has_var(INPUT_POST, 'balnc_income_tx')) {
         require_once '../web_db/multi_values.php';
         require_once '../web_db/other_fx.php';
@@ -371,7 +361,7 @@
         $other = new other_fx();
         $min_date = $other->get_this_year_start_date();
         $max_date = $other->get_this_year_end_date();
-        $other->list_sales_stock_by_date($min_date, $max_date);
+        $other->list_income_tax_by_date($min_date, $max_date);
     }
 
     if (filter_has_var(INPUT_POST, 'full_book_income_statement')) {
@@ -396,3 +386,6 @@
     if (filter_has_var(INPUT_POST, 'full_book_cashflow')) {
         
     }
+?>
+
+}
