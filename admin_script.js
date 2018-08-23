@@ -946,10 +946,10 @@ function financial_details() {
     //i
     $('.inc_other_c_assets').click(function () {
         var inc_other_c_assets = 'c';
-        $('.rep_title').html('Cash report');
+        $('.rep_title').html('Current Asset report');
 
         $.post('handler_report.php', {inc_other_c_assets: inc_other_c_assets}, function (data) {
-            fin_res = data;
+            fin_res = data;            
         }).complete(function () {
             $('.load_gif').hide(5, function () {
                 $('.fin_data_res').html(fin_res);
