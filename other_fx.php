@@ -982,8 +982,7 @@
                         left join journal_entry_header on journal_entry_header.journal_entry_header_id=journal_entry_line.journal_entry_header
                         join account_type on account.acc_type=account_type.account_type_id       
                         where account_type.name='Bank' and journal_entry_line.entry_date>=:min_date and journal_entry_line.entry_date<=:max_date
-                       
-";
+                        group by account_type.name";
                         $stmt = $db->prepare($sql);
                         $stmt->execute(array(":min_date" => $min_date, ":max_date" => $max_date));
 
@@ -1139,6 +1138,45 @@
                             </tr><?php
                         }
                     }
+                    // update from bojos 
+                    // get income tax list 
+                        function list_income_tax_by_date($min_date, $max_date) {
+                        $db = new dbconnection();
+                        $sql = "select account.name as account,journal_entry_line.entry_date,journal_entry_line.memo,   journal_entry_line.amount  from account               
+                                join journal_entry_line on journal_entry_line.accountid=account.account_id
+                                join account_type on account.acc_type=account_type.account_type_id   
+                                where account.name='Income Tax'  and journal_entry_line.entry_date>=:min_date and journal_entry_line.entry_date<=:max_date
+                                 ";
+                        $stmt = $db->openConnection()->prepare($sql);
+                        $stmt->execute(array(":min_date" => $min_date, ":max_date" => $max_date));
+                        while ($row = $stmt->fetch()) {
+                            ?><tr>
+                                <td><?php echo $row['account'] ?></td>
+                                <td><?php echo $row['amount'] ?></td>
+                                <td><?php echo $row['memo'] ?></td>
+                                <td><?php echo $row['entry_date'] ?></td>
+                            </tr><?php
+                        }
+                    }
+                // function to get the list of all interests income
+                       function list_interest_income_by_date($min_date, $max_date) {
+                        $db = new dbconnection();
+                        $sql = "select account.name as account,journal_entry_line.entry_date,journal_entry_line.memo,   journal_entry_line.amount  from account               
+                                join journal_entry_line on journal_entry_line.accountid=account.account_id
+                                join account_type on account.acc_type=account_type.account_type_id   
+                                where account.name='Interest Income'  and journal_entry_line.entry_date>=:min_date and journal_entry_line.entry_date<=:max_date
+                                 ";
+                        $stmt = $db->openConnection()->prepare($sql);
+                        $stmt->execute(array(":min_date" => $min_date, ":max_date" => $max_date));
+                        while ($row = $stmt->fetch()) {
+                            ?><tr>
+                                <td><?php echo $row['account'] ?></td>
+                                <td><?php echo $row['amount'] ?></td>
+                                <td><?php echo $row['memo'] ?></td>
+                                <td><?php echo $row['entry_date'] ?></td>
+                            </tr><?php
+                        }
+                    }
 
                     function get_research_dev_by_date($min_date, $max_date) {
                         $db = new dbconnection();
@@ -1146,6 +1184,36 @@
                                 join journal_entry_line on journal_entry_line.accountid=account.account_id
                                 join account_type on account.acc_type=account_type.account_type_id   
                                 where account_type.name='Other Expense'  and journal_entry_line.entry_date>=:min_date and journal_entry_line.entry_date<=:max_date
+                                group by account_type.account_type_id ";
+                        $stmt = $db->openConnection()->prepare($sql);
+                        $stmt->execute(array(":min_date" => $min_date, ":max_date" => $max_date));
+                        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+                        $field = $row['amount'];
+                        return $field;
+                    }
+
+                    // get income tax
+                           function get_income_tax_by_date($min_date, $max_date) {
+                        $db = new dbconnection();
+                        $sql = "select account.name as account,  sum(journal_entry_line.amount) as amount from account               
+                                join journal_entry_line on journal_entry_line.accountid=account.account_id
+                                join account_type on account.acc_type=account_type.account_type_id   
+                                where account.name='Income Tax'  and journal_entry_line.entry_date>=:min_date and journal_entry_line.entry_date<=:max_date
+                                group by account_type.account_type_id ";
+                        $stmt = $db->openConnection()->prepare($sql);
+                        $stmt->execute(array(":min_date" => $min_date, ":max_date" => $max_date));
+                        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+                        $field = $row['amount'];
+                        return $field;
+                    }
+                // get interest income 
+
+                              function get_interest_income_by_date($min_date, $max_date) {
+                        $db = new dbconnection();
+                        $sql = "select account.name as account,  sum(journal_entry_line.amount) as amount from account               
+                                join journal_entry_line on journal_entry_line.accountid=account.account_id
+                                join account_type on account.acc_type=account_type.account_type_id   
+                                where account.name='Interest Income'  and journal_entry_line.entry_date>=:min_date and journal_entry_line.entry_date<=:max_date
                                 group by account_type.account_type_id ";
                         $stmt = $db->openConnection()->prepare($sql);
                         $stmt->execute(array(":min_date" => $min_date, ":max_date" => $max_date));
@@ -1338,7 +1406,6 @@
                                         </tr><?php }
                                         ?></table><?php
                             }
-
                             //
                             function list_other_current_asset_by_date($min_date, $max_date) {// these are the prepaid expenses
                                 $db = new dbconnection();
@@ -1412,10 +1479,10 @@
                             function get_sum_acc_pay_by_date($min_date, $max_date) {// these are the prepaid expenses
                                 $db = new dbconnection();
                                 $sql = "select account.name as account,  sum(journal_entry_line.amount) as amount from account               
-                                        join journal_entry_line on journal_entry_line.accountid=account.account_id
-                                        join account_type on account.acc_type=account_type.account_type_id   
-                                        where account_type.name='account payable'  and journal_entry_line.entry_date>=:min_date and journal_entry_line.entry_date<=:max_date
-                                        group by account_type.account_type_id ";
+                 join journal_entry_line on journal_entry_line.accountid=account.account_id
+                 join account_type on account.acc_type=account_type.account_type_id   
+                 where account_type.name='account payable'  and journal_entry_line.entry_date>=:min_date and journal_entry_line.entry_date<=:max_date
+                 group by account_type.account_type_id ";
                                 $stmt = $db->openConnection()->prepare($sql);
                                 $stmt->execute(array(":min_date" => $min_date, ":max_date" => $max_date));
                                 $row = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -1601,12 +1668,12 @@
                                 $stmt->execute(array(":min_date" => $min_date, ":max_date" => $max_date));
                                 ?><table class="income_table2"><tr>
                                         <td colspan="2"> </td><tr><?php
-                                            while ($row = $stmt->fetch()) {
-                                                ?><tr>
+                                        while ($row = $stmt->fetch()) {
+                                            ?><tr>
                                             <td><?php echo $row['account'] ?></td>
                                             <td><?php echo number_format($row['amount']) ?></td>
                                         </tr><?php }
-                                            ?></table><?php
+                                        ?></table><?php
                             }
 
                             function get_sum_current_debt_by_date($min_date, $max_date) {// these are the prepaid expenses
@@ -1634,12 +1701,12 @@
                                 $stmt->execute(array(":min_date" => $min_date, ":max_date" => $max_date));
                                 ?><table class="income_table2"><tr>
                                         <td colspan="2"> </td><tr><?php
-                                            while ($row = $stmt->fetch()) {
-                                                ?><tr>
+                                        while ($row = $stmt->fetch()) {
+                                            ?><tr>
                                             <td><?php echo $row['account'] ?></td>
                                             <td><?php echo number_format($row['amount']) ?></td>
                                         </tr><?php }
-                                            ?></table><?php
+                                        ?></table><?php
                             }
 
                             function get_sum_longterm_debt_by_date($min_date, $max_date) {// these are the prepaid expenses
@@ -1672,14 +1739,14 @@
                                             <td>Memo </td>
                                             <td>Entry date </td>
                                         <tr></thead><?php
-                                        while ($row = $stmt->fetch()) {
-                                            ?><tr>
+                                    while ($row = $stmt->fetch()) {
+                                        ?><tr>
                                             <td><?php echo $row['account'] ?></td>
                                             <td><?php echo number_format($row['amount']) ?></td>
                                             <td><?php echo $row['memo'] ?></td>
                                             <td><?php echo $row['entry_date'] ?></td>
                                         </tr><?php }
-                                        ?></table><?php
+                                    ?></table><?php
                             }
 
                             function get_capital_stock_by_date($min_date, $max_date) {// these are the prepaid expenses
@@ -1712,14 +1779,14 @@
                                             <td>Memo </td>
                                             <td>Entry date </td>
                                         <tr></thead><?php
-                                        while ($row = $stmt->fetch()) {
-                                            ?><tr>
+                                    while ($row = $stmt->fetch()) {
+                                        ?><tr>
                                             <td><?php echo $row['account'] ?></td>
                                             <td><?php echo number_format($row['amount']) ?></td>
                                             <td><?php echo $row['memo'] ?></td>
                                             <td><?php echo $row['entry_date'] ?></td>
                                         </tr><?php }
-                                        ?></table><?php
+                                    ?></table><?php
                             }
 
                             function get_sum_retained_earn_by_date($min_date, $max_date) {// these are the prepaid expenses
@@ -1747,12 +1814,12 @@
                                 $stmt->execute(array(":min_date" => $min_date, ":max_date" => $max_date));
                                 ?><table class="income_table2"><tr>
                                         <td colspan="2"> </td><tr><?php
-                                            while ($row = $stmt->fetch()) {
-                                                ?><tr>
+                                        while ($row = $stmt->fetch()) {
+                                            ?><tr>
                                             <td><?php echo $row['account'] ?></td>
                                             <td><?php echo number_format($row['amount']) ?></td>
                                         </tr><?php }
-                                            ?></table><?php
+                                        ?></table><?php
                             }
 
                             function list_acc_rec_by_date($min_date, $max_date) {
@@ -1766,12 +1833,12 @@
                                 $stmt->execute(array(":min_date" => $min_date, ":max_date" => $max_date));
                                 ?><table class="income_table2"><tr>
                                         <td colspan="2"> </td><tr><?php
-                                            while ($row = $stmt->fetch()) {
-                                                ?><tr>
+                                        while ($row = $stmt->fetch()) {
+                                            ?><tr>
                                             <td><?php echo $row['account'] ?></td>
                                             <td><?php echo number_format($row['amount']) ?></td>
                                         </tr><?php }
-                                            ?></table><?php
+                                        ?></table><?php
                             }
 
                             function get_sum_inventory_by_date($min_date, $max_date) {
@@ -1834,14 +1901,14 @@
                                             <td>Memo</td>
                                             <td>Entry date</td>
                                         <tr></thead><?php
-                                        while ($row = $stmt->fetch()) {
-                                            ?><tr>
+                                    while ($row = $stmt->fetch()) {
+                                        ?><tr>
                                             <td><?php echo $row['account'] ?></td>
                                             <td><?php echo number_format($row['amount']) ?></td>
                                             <td><?php echo $row['memo'] ?></td>
                                             <td><?php echo $row['entry_date'] ?></td>
                                         </tr><?php }
-                                        ?></table><?php
+                                    ?></table><?php
                             }
 
                             function get_sum_fixed_assets_by_date($min_date, $max_date) {
@@ -2216,7 +2283,7 @@
                                             ?><tr> 
                                                 <td><?php echo '<input class="only_numbers" name="txt_item" disabled type="text" value="' . $row['item_name'] . '">'; ?>
                                                     <?php echo '<input class="only_numbers" name="txt_itemid[]" type="hidden" value="' . $row['item'] . '">'; ?>
-                <?php echo '<input class="only_numbers" name="txt_requestid[]" type="hidden" value="' . $row['p_request_id'] . '">'; ?>
+                                                    <?php echo '<input class="only_numbers" name="txt_requestid[]" type="hidden" value="' . $row['p_request_id'] . '">'; ?>
 
                                                 </td>
                                                 <td><?php echo '<input class="only_numbers" name="txt_quantity[]" type="text" value="' . number_format($row['quantity']) . '">'; ?></td>
@@ -2295,10 +2362,10 @@
                                     while ($row = $stmt->fetch()) {
                                         ?><tr> 
                                             <td>
-                <?php echo $row['account']; ?>
+                                                <?php echo $row['account']; ?>
                                             </td>
                                             <td class="quantity_id_cols sales_invoice_line " title="sales_invoice_line" >
-                <?php echo number_format($this->_e(number_format($row['amount']))); ?>
+                                                <?php echo number_format($this->_e(number_format($row['amount']))); ?>
                                             </td>
                                         </tr>
                                         <?php
@@ -2374,10 +2441,10 @@
                                             ?><tr> 
 
                                                 <td>
-                <?php echo $row['account']; ?>
+                                                    <?php echo $row['account']; ?>
                                                 </td>
                                                 <td class="quantity_id_cols sales_invoice_line " title="sales_invoice_line" >
-                <?php echo number_format($this->_e($row['amount'])); ?>
+                                                    <?php echo number_format($this->_e($row['amount'])); ?>
                                                 </td>
 
                                             </tr>
@@ -2402,7 +2469,7 @@
                                         <thead><tr><td> sales_quote_line_id </td><td> quantity </td><td> unit_cost </td><td> entry_date </td><td> User </td><td> amount </td><td> measurement </td><td> item </td>
                                             </tr></thead>
 
-            <?php while ($row = $stmt->fetch()) { ?><tr> 
+                                        <?php while ($row = $stmt->fetch()) { ?><tr> 
                                                 <td>        <?php echo $row['sales_quote_line_id']; ?> </td>
                                                 <td>        <?php echo $row['quantity']; ?> </td>
                                                 <td>        <?php echo $row['unit_cost']; ?> </td>
@@ -2413,7 +2480,7 @@
                                                 <td>        <?php echo $row['item']; ?> </td>
 
                                             </tr>
-                                    <?php } ?></table>
+                                        <?php } ?></table>
                                     <?php
                                 }
 
@@ -2515,8 +2582,8 @@
                                     $start_year = date('Y');
                                     $start_month = '0' . 1;
                                     $start_date = '0' . 1;
-                                    if (isset($_SESSION['min_date'])) {
-                                        return $_SESSION['min_date'];
+                                    if (isset($_SESSION['rep_min_date'])) {
+                                        return $_SESSION['rep_min_date'];
                                     } else {
                                         return $start_year . '-' . $start_month . '-' . $start_date;
                                     }
@@ -2524,8 +2591,8 @@
 
                                 function get_this_year_end_date() {
                                     //End this year
-                                    if (isset($_SESSION['max_date'])) {
-                                        return $_SESSION['max_date'];
+                                    if (isset($_SESSION['rep_max_date'])) {
+                                        return $_SESSION['rep_max_date'];
                                     } else {
                                         return date('Y-m-d');
                                     }
@@ -2577,7 +2644,7 @@
                                     while ($row = $stmt->fetch()) {
                                         ?><tr> 
                                             <td class="description_id_cols taxgroup " title="taxgroup" >
-                <?php echo $this->_e($row['description']); ?>
+                                                <?php echo $this->_e($row['description']); ?>
                                             </td>
 
                                             <td class="">
@@ -2632,20 +2699,20 @@
                                                 <td> Confirm </td>
                                                 <td class="off"> Tax Applied </td>
                                                 <td class="off"> Is Active </td>
-                                        <?php if (isset($_SESSION['shall_delete'])) { ?><td>Delete</td><td>Update</td><?php } ?></tr></thead>
+                                                <?php if (isset($_SESSION['shall_delete'])) { ?><td>Delete</td><td>Update</td><?php } ?></tr></thead>
 
                                         <?php
                                         $pages = 1;
                                         while ($row = $stmt->fetch()) {
                                             ?><tr> 
                                                 <td>
-                <?php echo $row['taxgroup_id']; ?>
+                                                    <?php echo $row['taxgroup_id']; ?>
                                                 </td>
                                                 <td class="description_id_cols taxgroup tax_label_col" data-bind="<?php echo $row['taxgroup_id']; ?>" title="taxgroup"  >
-                <?php echo $this->_e($row['description']); ?>
+                                                    <?php echo $this->_e($row['description']); ?>
                                                 </td>
                                                 <td title="taxgroup" >
-                <?php echo $this->_e($row['pur_sale']); ?>
+                                                    <?php echo $this->_e($row['pur_sale']); ?>
                                                 </td>
                                                 <td class="value_td" value="400">
                                                     <input type="text" class="textbox" />
@@ -2654,19 +2721,19 @@
                                                     <input type="button" class="confirm_buttons conf_tax" data-bind="<?php echo $row['taxgroup_id']; ?>" value="confirm"  style="margin-top: 0px;background-image: none;"/>
                                                 </td>
                                                 <td class="off">
-                <?php echo $this->_e($row['tax_applied']); ?>
+                                                    <?php echo $this->_e($row['tax_applied']); ?>
                                                 </td>
                                                 <td class="off">
-                                                <?php echo $this->_e($row['is_active']); ?>
+                                                    <?php echo $this->_e($row['is_active']); ?>
                                                 </td>
-                <?php if (isset($_SESSION['shall_delete'])) { ?>
+                                                <?php if (isset($_SESSION['shall_delete'])) { ?>
                                                     <td>
                                                         <a href="#" class="taxgroup_delete_link" style="color: #000080;" value="
-                    <?php echo $row['taxgroup_id']; ?>">Delete</a>
+                                                           <?php echo $row['taxgroup_id']; ?>">Delete</a>
                                                     </td>
                                                     <td>
                                                         <a href="#" class="taxgroup_update_link" style="color: #000080;" value="
-                                                <?php echo $row['taxgroup_id']; ?>">Update</a>
+                                                           <?php echo $row['taxgroup_id']; ?>">Update</a>
                                                     </td><?php } ?></tr>
                                             <?php
                                             $pages += 1;
@@ -2723,7 +2790,7 @@
                                                 <td> S/N </td>
                                                 <td> Purchase or Sale </td>
                                                 <td> Percentage </td><td> Purchaseid Sale id </td>
-                                        <?php if (isset($_SESSION['shall_delete'])) { ?> <td>Delete</td><td>Update</td><?php } ?></tr></thead>
+                                                <?php if (isset($_SESSION['shall_delete'])) { ?> <td>Delete</td><td>Update</td><?php } ?></tr></thead>
 
                                         <?php
                                         $pages = 1;
@@ -2731,25 +2798,25 @@
                                             ?><tr> 
 
                                                 <td>
-                <?php echo $row['tax_percentage_id']; ?>
+                                                    <?php echo $row['tax_percentage_id']; ?>
                                                 </td>
                                                 <td class="pur_sale_id_cols tax_percentage " title="tax_percentage" >
-                <?php echo $this->_e($row['pur_sale']); ?>
+                                                    <?php echo $this->_e($row['pur_sale']); ?>
                                                 </td>
                                                 <td>
-                <?php echo $this->_e($row['percentage']) . '%'; ?>
+                                                    <?php echo $this->_e($row['percentage']) . '%'; ?>
                                                 </td>
                                                 <td>
-                <?php echo $this->_e($row['purid_saleid']); ?>
+                                                    <?php echo $this->_e($row['purid_saleid']); ?>
                                                 </td>
 
-                                                       <?php if (isset($_SESSION['shall_delete'])) { ?>   <td>
+                                                <?php if (isset($_SESSION['shall_delete'])) { ?>   <td>
                                                         <a href="#" class="tax_percentage_delete_link" style="color: #000080;" data-id_delete="tax_percentage_id"  data-table="
-                    <?php echo $row['tax_percentage_id']; ?>">Delete</a>
+                                                           <?php echo $row['tax_percentage_id']; ?>">Delete</a>
                                                     </td>
                                                     <td>
                                                         <a href="#" class="tax_percentage_update_link" style="color: #000080;" value="
-                                                <?php echo $row['tax_percentage_id']; ?>">Update</a>
+                                                           <?php echo $row['tax_percentage_id']; ?>">Update</a>
                                                     </td><?php } ?></tr>
                                             <?php
                                             $pages += 1;
