@@ -10,7 +10,7 @@
         require_once '../web_db/Reports.php';
         $obj = new Reports();
         $min_date = date("Y-m-d");
-        $max_date =  date("Y-m-d");;
+        $max_date =  date("Y-m-d");
         $_SESSION['min_date'] = $min_date;
         $_SESSION['max_date'] = $max_date;
           echo $_SESSION['min_date'].'   '.$_SESSION['max_date'];
@@ -90,13 +90,11 @@
 
     if (filter_has_var(INPUT_POST, 'the_rep_dates')) {
         $the_rep_dates = filter_input(INPUT_POST, 'the_rep_dates');
-        $_SESSION['rep_min_date'] = filter_input(INPUT_POST, 'date1');
-        $_SESSION['rep_max_date'] = filter_input(INPUT_POST, 'date2');
+        $_SESSION['min_date'] = filter_input(INPUT_POST, 'date1');
+        $_SESSION['max_date'] = filter_input(INPUT_POST, 'date2');
 
         //Lest us just verigy of the dates are well received
         echo 'The date 1 is ' . $_SESSION['rep_min_date'] . '  and the date 2 is: ' . $_SESSION['rep_max_date'];
-
-
 
         if ($the_rep_dates == 'income') {
             
@@ -211,6 +209,8 @@
         $other = new other_fx();
         $min_date = $other->get_this_year_start_date();
         $max_date = $other->get_this_year_end_date();
+        
+        
         echo $other->list_other_current_asset_by_date($min_date, $max_date);
     }
 

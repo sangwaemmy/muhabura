@@ -871,7 +871,7 @@ class other_fx {
             $sql = "select account.name as account,  account.account_id, journal_entry_line.amount as amount ,journal_entry_line.entry_date, journal_entry_line.memo  from account
                             join journal_entry_line on journal_entry_line.accountid=account.account_id
                             join account_type on account.acc_type=account_type.account_type_id 
-                            where account_type.name=:name ";
+                            where account_type.name=:name and  ";
             $stmt = $db->openConnection()->prepare($sql);
             $stmt->execute(array(":name" => $inc_exp));
             ?><table class="income_table2">
@@ -880,7 +880,7 @@ class other_fx {
                         <td>Account</td>
                         <td>Amount</td>
                         <td>Memo</td>
-                        <td>Amout</td>
+                        <td>Date</td>
                     </tr>
                 </thead> 
                 <?php
@@ -985,7 +985,7 @@ class other_fx {
                    
 ";
                     $stmt = $db->prepare($sql);
-                    $stmt->execute(array( ":min_date" => $min_date, ":max_date" => $max_date));
+                    $stmt->execute(array(":min_date" => $min_date, ":max_date" => $max_date));
                     $row = $stmt->fetch(PDO::FETCH_ASSOC);
                     $field = $row['amount'];
                     return $field;
@@ -1285,11 +1285,11 @@ class other_fx {
 
                         function get_sum_acc_rec_by_date($min_date, $max_date) {
                             $db = new dbconnection();
-                            $sql = "select   sum(journal_entry_line.amount) as amount from account               
-                 join journal_entry_line on journal_entry_line.accountid=account.account_id
-                 join account_type on account.acc_type=account_type.account_type_id   
-                 where account_type.name='account receivable'  and journal_entry_line.entry_date>=:min_date and journal_entry_line.entry_date<=:max_date
-                  ";
+                            $sql = "select   sum(journal_entry_line.amount) as amount from journal_entry_line               
+                                join account  on journal_entry_line.accountid=account.account_id
+                                join account_type on account.acc_type=account_type.account_type_id   
+                                where account_type.name='account receivable'  and journal_entry_line.entry_date>=:min_date and journal_entry_line.entry_date<=:max_date
+                                group by account.account_id ";
                             $stmt = $db->openConnection()->prepare($sql);
                             $stmt->execute(array(":min_date" => $min_date, ":max_date" => $max_date));
                             $row = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -1344,7 +1344,7 @@ class other_fx {
                             $sql = "select account.name as account,journal_entry_line.entry_date,journal_entry_line.memo,  journal_entry_line.amount as amount from account               
                                 join journal_entry_line on journal_entry_line.accountid=account.account_id
                                 join account_type on account.acc_type=account_type.account_type_id   
-                                where account_type.name='Other Current asset'  and journal_entry_line.entry_date>=:min_date and journal_entry_line.entry_date<=:max_date
+                                where account_type.name='Other Current assets'  and journal_entry_line.entry_date>=:min_date and journal_entry_line.entry_date<=:max_date
                                 ";
                             $stmt = $db->openConnection()->prepare($sql);
                             $stmt->execute(array(":min_date" => $min_date, ":max_date" => $max_date));
@@ -1657,11 +1657,11 @@ class other_fx {
 
                         function list_longterm_debt_by_date($min_date, $max_date) {// these are the prepaid expenses
                             $db = new dbconnection();
-                            $sql = "select account.name as account,journal_entry_line.entry_date,journal_entry_line.memo,  sum(journal_entry_line.amount) as amount from account               
+                            $sql = "select account.name as account,journal_entry_line.entry_date,journal_entry_line.memo,  journal_entry_line.amount from account               
                             join journal_entry_line on journal_entry_line.accountid=account.account_id
                             join account_type on account.acc_type=account_type.account_type_id   
                             where account_type.name='long term liability'  and journal_entry_line.entry_date>=:min_date and journal_entry_line.entry_date<=:max_date
-                            group by account_type.account_type_id ";
+                            ";
                             $stmt = $db->openConnection()->prepare($sql);
                             $stmt->execute(array(":min_date" => $min_date, ":max_date" => $max_date));
                             ?><table class="income_table2 out_border">
@@ -1683,11 +1683,12 @@ class other_fx {
 
                         function get_capital_stock_by_date($min_date, $max_date) {// these are the prepaid expenses
                             $db = new dbconnection();
-                            $sql = "select  sum(journal_entry_line.amount) as amount from account               
-                                join journal_entry_line on journal_entry_line.accountid=account.account_id
-                                join account_type on account.acc_type=account_type.account_type_id   
-                                where account.name='capital stock'  and journal_entry_line.entry_date>=:min_date and journal_entry_line.entry_date<=:max_date
-                                group by account_type.account_type_id ";
+                            $sql = "select   sum(journal_entry_line.amount) as amount from journal_entry_line               
+                                    join account on journal_entry_line.accountid=account.account_id
+                                    join account_type on account.acc_type=account_type.account_type_id   
+                                    WHERE account_type.name='Equity' and account.name='share capital' or account.name='capital stock'  
+                                    and journal_entry_line.entry_date>=:min_date and journal_entry_line.entry_date<=:max_date group by account_type.account_type_id                                
+";
                             $stmt = $db->openConnection()->prepare($sql);
                             $stmt->execute(array(":min_date" => $min_date, ":max_date" => $max_date));
                             $row = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -1697,11 +1698,11 @@ class other_fx {
 
                         function list_capital_stock_by_date($min_date, $max_date) {// these are the prepaid expenses
                             $db = new dbconnection();
-                            $sql = "select account.name as account,journal_entry_line.entry_date,journal_entry_line.memo,  sum(journal_entry_line.amount) as amount from account               
+                            $sql = "select account.name as account,journal_entry_line.entry_date,journal_entry_line.memo, journal_entry_line.amount from account               
                             join journal_entry_line on journal_entry_line.accountid=account.account_id
                             join account_type on account.acc_type=account_type.account_type_id   
                             where account.name='capital stock'  and journal_entry_line.entry_date>=:min_date and journal_entry_line.entry_date<=:max_date
-                            group by account_type.account_type_id ";
+                          ";
                             $stmt = $db->openConnection()->prepare($sql);
                             $stmt->execute(array(":min_date" => $min_date, ":max_date" => $max_date));
                             ?><table class="income_table2 out_border">
@@ -1756,11 +1757,11 @@ class other_fx {
 
                         function list_acc_rec_by_date($min_date, $max_date) {
                             $db = new dbconnection();
-                            $sql = "select  sum(journal_entry_line.amount) as amount from account               
+                            $sql = "select  journal_entry_line.amount from account               
                                 join journal_entry_line on journal_entry_line.accountid=account.account_id
                                 join account_type on account.acc_type=account_type.account_type_id   
                                 where account_type.name='account receivable'  and journal_entry_line.entry_date>=:min_date and journal_entry_line.entry_date<=:max_date
-                                group by account_type.account_type_id ";
+                                ";
                             $stmt = $db->openConnection()->prepare($sql);
                             $stmt->execute(array(":min_date" => $min_date, ":max_date" => $max_date));
                             ?><table class="income_table2"><tr>
@@ -1791,13 +1792,13 @@ class other_fx {
 
                         function list_inventory_by_date($min_date, $max_date) {
                             $db = new dbconnection();
-                            $sql = "select purchase_invoice_line.account,account.name as acc,stock_into_main.entry_date, stock_into_main.item, sum(stock_into_main.quantity-distriibution.taken_qty) as quantity_out,
-                                    sum(purchase_invoice_line.amount) as amount, purchase_invoice_line.unit_cost from stock_into_main 
+                            $sql = "select purchase_invoice_line.account,account.name as acc,stock_into_main.entry_date, stock_into_main.item, stock_into_main.quantity-distriibution.taken_qty,
+                                    purchase_invoice_line.amount, purchase_invoice_line.unit_cost from stock_into_main 
                                     join purchase_invoice_line on purchase_invoice_line.purchase_invoice_line_id=stock_into_main.purchaseid
                                     join distriibution on distriibution.item=stock_into_main.item
                                     join account on account.account_id=purchase_invoice_line.account
                                     where stock_into_main.entry_date>=:min_date and stock_into_main.entry_date<=:max_date
-                                    group by stock_into_main.item ";
+                                   ";
                             $stmt = $db->openConnection()->prepare($sql);
                             $stmt->execute(array(":min_date" => $min_date, ":max_date" => $max_date));
                             ?><table class="income_table2 out_border"><tr>
@@ -1819,11 +1820,11 @@ class other_fx {
 
                         function list_fixed_assets_by_date($min_date, $max_date) {
                             $db = new dbconnection();
-                            $sql = "select account.name as account,journal_entry_line.memo,journal_entry_line.entry_date,  sum(journal_entry_line.amount) as amount from account               
+                            $sql = "select account.name as account,journal_entry_line.memo,journal_entry_line.entry_date,  journal_entry_line.amount from account               
                                 join journal_entry_line on journal_entry_line.accountid=account.account_id
                                 join account_type on account.acc_type=account_type.account_type_id   
                                 where account_type.name<>'Bank'    and journal_entry_line.entry_date>=:min_date and journal_entry_line.entry_date<=:max_date
-                                group by account_type.account_type_id";
+                                ";
                             $stmt = $db->openConnection()->prepare($sql);
                             $stmt->execute(array(":min_date" => $min_date, ":max_date" => $max_date));
                             ?><table class="income_table2 out_border">
@@ -1848,8 +1849,8 @@ class other_fx {
                             $sql = "select   sum(journal_entry_line.amount) as amount from account               
                                     join journal_entry_line on journal_entry_line.accountid=account.account_id
                                     join account_type on account.acc_type=account_type.account_type_id   
-                                    where account_type.name<>'Other Current asset'   and account_type.name<>'other asset' or account_type.name='fixed asset'   and journal_entry_line.entry_date>=:min_date and journal_entry_line.entry_date<=:max_date
-                                    group by account_type.account_type_id";
+                                    where 
+                                    journal_entry_line.entry_date>=:min_date and journal_entry_line.entry_date<=:max_date ";
                             $stmt = $db->openConnection()->prepare($sql);
                             $stmt->execute(array(":min_date" => $min_date, ":max_date" => $max_date));
                             $row = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -1890,289 +1891,290 @@ class other_fx {
                             }
                         }
 
-                        function get_project_by_project_line($type) {
-                            try {
-                                $database = new dbconnection();
-                                $db = $database->openconnection();
-                                $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-                                $sql = "select p_budget_prep.p_budget_prep_id   ,p_budget_prep.name from p_budget_prep	join p_type_project on p_type_project.p_type_project_id=p_budget_prep.project_type     where p_type_project.p_type_project_id=:type";
-                                $stmt = $db->prepare($sql);
-                                $stmt->execute(array(":type" => $type));
-                                $data = array();
-                                while ($row = $stmt->fetch()) {
-                                    $data[] = array(
-                                        'id' => $row['p_budget_prep_id'],
-                                        'name' => $row['name']
-                                    );
-                                }
-                                return json_encode($data);
-                            } catch (PDOException $e) {
-                                echo $e;
-                            }
-                        }
+                    
+    function get_project_by_project_line($type) {
+        try {
+            $database = new dbconnection();
+            $db = $database->openconnection();
+            $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $sql = "select p_budget_prep.p_budget_prep_id   ,p_budget_prep.name from p_budget_prep	join p_type_project on p_type_project.p_type_project_id=p_budget_prep.project_type     where p_type_project.p_type_project_id=:type";
+            $stmt = $db->prepare($sql);
+            $stmt->execute(array(":type" => $type));
+            $data = array();
+            while ($row = $stmt->fetch()) {
+                $data[] = array(
+                    'id' => $row['p_budget_prep_id'],
+                    'name' => $row['name']
+                );
+            }
+            return json_encode($data);
+        } catch (PDOException $e) {
+            echo $e;
+        }
+    }
 
-                        function get_actiovity_by_project($type) {
-                            try {
-                                $database = new dbconnection();
-                                $db = $database->openconnection();
-                                $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-                                $sql = " select p_activity.p_activity_id, p_activity.name   from  p_activity   join p_budget_prep on p_budget_prep.p_budget_prep_id=p_activity.project where p_budget_prep.p_budget_prep_id=:id";
-                                $stmt = $db->prepare($sql);
-                                $stmt->execute(array(":id" => $type));
-                                $data = array();
-                                while ($row = $stmt->fetch()) {
-                                    $data[] = array(
-                                        'id' => $row['p_activity_id'],
-                                        'name' => $row['name']
-                                    );
-                                }
-                                return json_encode($data);
-                            } catch (PDOException $e) {
-                                echo $e;
-                            }
-                        }
-                        
-                        function get_sum_income__exp_project($inc_expense) {//this function retreives the income or expense from sales receit
-                            $db = new dbconnection();
-                            $sql = "select sum(sales_invoice_line.amount) as amount from sales_receit_header
+    function get_actiovity_by_project($type) {
+        try {
+            $database = new dbconnection();
+            $db = $database->openconnection();
+            $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $sql = " select p_activity.p_activity_id, p_activity.name   from  p_activity   join p_budget_prep on p_budget_prep.p_budget_prep_id=p_activity.project where p_budget_prep.p_budget_prep_id=:id";
+            $stmt = $db->prepare($sql);
+            $stmt->execute(array(":id" => $type));
+            $data = array();
+            while ($row = $stmt->fetch()) {
+                $data[] = array(
+                    'id' => $row['p_activity_id'],
+                    'name' => $row['name']
+                );
+            }
+            return json_encode($data);
+        } catch (PDOException $e) {
+            echo $e;
+        }
+    }
+
+    function get_sum_income__exp_project($inc_expense) {//this function retreives the income or expense from sales receit
+        $db = new dbconnection();
+        $sql = "select sum(sales_invoice_line.amount) as amount from sales_receit_header
                             join sales_invoice_line on sales_receit_header.sales_invoice=sales_invoice_line.sales_invoice_line_id
                             join account  on account.account_id=sales_receit_header.account
                             join account_type on account.acc_type=account_type.account_type_id
                             where account_type=:name";
-                            $stmt = $db->openConnection()->prepare($sql);
-                            $stmt->execute(array(":name" => $inc_expense));
-                            $row = $stmt->fetch(PDO::FETCH_ASSOC);
-                            $field = $row['amount'];
-                            return $field;
-                        }
+        $stmt = $db->openConnection()->prepare($sql);
+        $stmt->execute(array(":name" => $inc_expense));
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        $field = $row['amount'];
+        return $field;
+    }
 
 // </editor-fold>
-                        // <editor-fold defaultstate="collapsed" desc="--Combo refilll on the fly --">
-                        function get_cbo_refilled_p_type_project() {
-                            try {
-                                $database = new dbconnection();
-                                $db = $database->openconnection();
-                                $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-                                $sql = "select p_type_project_id, name from  p_type_project";
-                                $stmt = $db->prepare($sql);
-                                $stmt->execute();
-                                $data = array();
-                                while ($row = $stmt->fetch()) {
-                                    $data[] = array(
-                                        'id' => $row['p_type_project_id'],
-                                        'name' => $row['name']
-                                    );
-                                }
-                                return json_encode($data);
-                            } catch (PDOException $e) {
-                                echo $e;
-                            }
-                        }
+    // <editor-fold defaultstate="collapsed" desc="--Combo refilll on the fly --">
+    function get_cbo_refilled_p_type_project() {
+        try {
+            $database = new dbconnection();
+            $db = $database->openconnection();
+            $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $sql = "select p_type_project_id, name from  p_type_project";
+            $stmt = $db->prepare($sql);
+            $stmt->execute();
+            $data = array();
+            while ($row = $stmt->fetch()) {
+                $data[] = array(
+                    'id' => $row['p_type_project_id'],
+                    'name' => $row['name']
+                );
+            }
+            return json_encode($data);
+        } catch (PDOException $e) {
+            echo $e;
+        }
+    }
 
-                        function get_cbo_refilled_p_fiscal_year() {
-                            try {
-                                $database = new dbconnection();
-                                $db = $database->openconnection();
-                                $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-                                $sql = "select p_fiscal_year_id, fiscal_year_name from  p_fiscal_year";
-                                $stmt = $db->prepare($sql);
-                                $stmt->execute();
-                                $data = array();
-                                while ($row = $stmt->fetch()) {
-                                    $data[] = array(
-                                        'id' => $row['p_fiscal_year_id'],
-                                        'name' => $row['fiscal_year_name']
-                                    );
-                                }
-                                return json_encode($data);
-                            } catch (PDOException $e) {
-                                echo $e;
-                            }
-                        }
+    function get_cbo_refilled_p_fiscal_year() {
+        try {
+            $database = new dbconnection();
+            $db = $database->openconnection();
+            $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $sql = "select p_fiscal_year_id, fiscal_year_name from  p_fiscal_year";
+            $stmt = $db->prepare($sql);
+            $stmt->execute();
+            $data = array();
+            while ($row = $stmt->fetch()) {
+                $data[] = array(
+                    'id' => $row['p_fiscal_year_id'],
+                    'name' => $row['fiscal_year_name']
+                );
+            }
+            return json_encode($data);
+        } catch (PDOException $e) {
+            echo $e;
+        }
+    }
 
-                        function get_cbo_refilled_p_budget_items() {
-                            try {
-                                $database = new dbconnection();
-                                $db = $database->openconnection();
-                                $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-                                $sql = "select p_budget_items_id, item_name from  p_budget_items";
-                                $stmt = $db->prepare($sql);
-                                $stmt->execute();
-                                $data = array();
-                                while ($row = $stmt->fetch()) {
-                                    $data[] = array(
-                                        'id' => $row['p_budget_items_id'],
-                                        'name' => $row['item_name']
-                                    );
-                                }
-                                return json_encode($data);
-                            } catch (PDOException $e) {
-                                echo $e;
-                            }
-                        }
+    function get_cbo_refilled_p_budget_items() {
+        try {
+            $database = new dbconnection();
+            $db = $database->openconnection();
+            $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $sql = "select p_budget_items_id, item_name from  p_budget_items";
+            $stmt = $db->prepare($sql);
+            $stmt->execute();
+            $data = array();
+            while ($row = $stmt->fetch()) {
+                $data[] = array(
+                    'id' => $row['p_budget_items_id'],
+                    'name' => $row['item_name']
+                );
+            }
+            return json_encode($data);
+        } catch (PDOException $e) {
+            echo $e;
+        }
+    }
 
-                        function get_cbo_refilled_account() {
-                            try {
-                                $database = new dbconnection();
-                                $db = $database->openconnection();
-                                $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-                                $sql = "select account_id, name from  account";
-                                $stmt = $db->prepare($sql);
-                                $stmt->execute();
-                                $data = array();
-                                while ($row = $stmt->fetch()) {
-                                    $data[] = array(
-                                        'id' => $row['account_id'],
-                                        'name' => $row['name']
-                                    );
-                                }
-                                return json_encode($data);
-                            } catch (PDOException $e) {
-                                echo $e;
-                            }
-                        }
+    function get_cbo_refilled_account() {
+        try {
+            $database = new dbconnection();
+            $db = $database->openconnection();
+            $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $sql = "select account_id, name from  account";
+            $stmt = $db->prepare($sql);
+            $stmt->execute();
+            $data = array();
+            while ($row = $stmt->fetch()) {
+                $data[] = array(
+                    'id' => $row['account_id'],
+                    'name' => $row['name']
+                );
+            }
+            return json_encode($data);
+        } catch (PDOException $e) {
+            echo $e;
+        }
+    }
 
-                        function get_cbo_refilled_supplier() {
-                            try {
-                                $database = new dbconnection();
-                                $db = $database->openconnection();
-                                $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-                                $sql = "select supplier.supplier_id, supplier.name, party.name as party from  supplier "
-                                        . " join party on party.party_id=supplier.party";
-                                $stmt = $db->prepare($sql);
-                                $stmt->execute();
-                                $data = array();
-                                while ($row = $stmt->fetch()) {
-                                    $data[] = array(
-                                        'id' => $row['supplier_id'],
-                                        'name' => $row['party']
-                                    );
-                                }
-                                return json_encode($data);
-                            } catch (PDOException $e) {
-                                echo $e;
-                            }
-                        }
+    function get_cbo_refilled_supplier() {
+        try {
+            $database = new dbconnection();
+            $db = $database->openconnection();
+            $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $sql = "select supplier.supplier_id, supplier.name, party.name as party from  supplier "
+                    . " join party on party.party_id=supplier.party";
+            $stmt = $db->prepare($sql);
+            $stmt->execute();
+            $data = array();
+            while ($row = $stmt->fetch()) {
+                $data[] = array(
+                    'id' => $row['supplier_id'],
+                    'name' => $row['party']
+                );
+            }
+            return json_encode($data);
+        } catch (PDOException $e) {
+            echo $e;
+        }
+    }
 
-                        function get_cbo_refilled_customer() {
-                            try {
-                                $database = new dbconnection();
-                                $db = $database->openconnection();
-                                $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-                                $sql = "select customer_id, party.name as party from  customer "
-                                        . " join party on party.party_id= customer.party_id";
-                                $stmt = $db->prepare($sql);
-                                $stmt->execute();
-                                $data = array();
-                                while ($row = $stmt->fetch()) {
-                                    $data[] = array(
-                                        'id' => $row['customer_id'],
-                                        'name' => $row['party']
-                                    );
-                                }
-                                return json_encode($data);
-                            } catch (PDOException $e) {
-                                echo $e;
-                            }
-                        }
+    function get_cbo_refilled_customer() {
+        try {
+            $database = new dbconnection();
+            $db = $database->openconnection();
+            $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $sql = "select customer_id, party.name as party from  customer "
+                    . " join party on party.party_id= customer.party_id";
+            $stmt = $db->prepare($sql);
+            $stmt->execute();
+            $data = array();
+            while ($row = $stmt->fetch()) {
+                $data[] = array(
+                    'id' => $row['customer_id'],
+                    'name' => $row['party']
+                );
+            }
+            return json_encode($data);
+        } catch (PDOException $e) {
+            echo $e;
+        }
+    }
 
-                        function get_cbo_refilled_measurement() {
-                            try {
-                                $database = new dbconnection();
-                                $db = $database->openconnection();
-                                $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-                                $sql = "select measurement_id, code from  measurement ";
-                                $stmt = $db->prepare($sql);
-                                $stmt->execute();
-                                $data = array();
-                                while ($row = $stmt->fetch()) {
-                                    $data[] = array(
-                                        'id' => $row['measurement_id'],
-                                        'name' => $row['code']
-                                    );
-                                }
-                                return json_encode($data);
-                            } catch (PDOException $e) {
-                                echo $e;
-                            }
-                        }
+    function get_cbo_refilled_measurement() {
+        try {
+            $database = new dbconnection();
+            $db = $database->openconnection();
+            $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $sql = "select measurement_id, code from  measurement ";
+            $stmt = $db->prepare($sql);
+            $stmt->execute();
+            $data = array();
+            while ($row = $stmt->fetch()) {
+                $data[] = array(
+                    'id' => $row['measurement_id'],
+                    'name' => $row['code']
+                );
+            }
+            return json_encode($data);
+        } catch (PDOException $e) {
+            echo $e;
+        }
+    }
 
-                        function get_cbo_refilled_p_activity() {
-                            try {
-                                $database = new dbconnection();
-                                $db = $database->openconnection();
-                                $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-                                $sql = "select p_activity_id, name from  p_activity";
-                                $stmt = $db->prepare($sql);
-                                $stmt->execute();
-                                $data = array();
-                                while ($row = $stmt->fetch()) {
-                                    $data[] = array(
-                                        'id' => $row['p_activity_id'],
-                                        'name' => $row['name']
-                                    );
-                                }
-                                return json_encode($data);
-                            } catch (PDOException $e) {
-                                echo $e;
-                            }
-                        }
+    function get_cbo_refilled_p_activity() {
+        try {
+            $database = new dbconnection();
+            $db = $database->openconnection();
+            $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $sql = "select p_activity_id, name from  p_activity";
+            $stmt = $db->prepare($sql);
+            $stmt->execute();
+            $data = array();
+            while ($row = $stmt->fetch()) {
+                $data[] = array(
+                    'id' => $row['p_activity_id'],
+                    'name' => $row['name']
+                );
+            }
+            return json_encode($data);
+        } catch (PDOException $e) {
+            echo $e;
+        }
+    }
 
-                        function get_cbo_refilled_staff_positions() {
-                            try {
-                                $database = new dbconnection();
-                                $db = $database->openconnection();
-                                $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-                                $sql = "select staff_positions_id, name from  staff_positions";
-                                $stmt = $db->prepare($sql);
-                                $stmt->execute();
-                                $data = array();
-                                while ($row = $stmt->fetch()) {
-                                    $data[] = array(
-                                        'id' => $row['staff_positions_id'],
-                                        'name' => $row['name']
-                                    );
-                                }
-                                return json_encode($data);
-                            } catch (PDOException $e) {
-                                echo $e;
-                            }
-                        }
+    function get_cbo_refilled_staff_positions() {
+        try {
+            $database = new dbconnection();
+            $db = $database->openconnection();
+            $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $sql = "select staff_positions_id, name from  staff_positions";
+            $stmt = $db->prepare($sql);
+            $stmt->execute();
+            $data = array();
+            while ($row = $stmt->fetch()) {
+                $data[] = array(
+                    'id' => $row['staff_positions_id'],
+                    'name' => $row['name']
+                );
+            }
+            return json_encode($data);
+        } catch (PDOException $e) {
+            echo $e;
+        }
+    }
 
-                        function get_cbo_refilled_p_budget_prep() {
-                            try {
-                                $database = new dbconnection();
-                                $db = $database->openconnection();
-                                $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-                                $sql = "select p_budget_prep_id, name from  p_budget_prep";
-                                $stmt = $db->prepare($sql);
-                                $stmt->execute();
-                                $data = array();
-                                while ($row = $stmt->fetch()) {
-                                    $data[] = array(
-                                        'id' => $row['p_budget_prep_id'],
-                                        'name' => $row['name']
-                                    );
-                                }
-                                return json_encode($data);
-                            } catch (PDOException $e) {
-                                echo $e;
-                            }
-                        }
+    function get_cbo_refilled_p_budget_prep() {
+        try {
+            $database = new dbconnection();
+            $db = $database->openconnection();
+            $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $sql = "select p_budget_prep_id, name from  p_budget_prep";
+            $stmt = $db->prepare($sql);
+            $stmt->execute();
+            $data = array();
+            while ($row = $stmt->fetch()) {
+                $data[] = array(
+                    'id' => $row['p_budget_prep_id'],
+                    'name' => $row['name']
+                );
+            }
+            return json_encode($data);
+        } catch (PDOException $e) {
+            echo $e;
+        }
+    }
 
 // </editor-fold>
 
-                        function get_items_by_request($mainrequest) {
-                            $database = new dbconnection();
-                            $db = $database->openConnection();
-                            $sql = "select p_request.p_request_id,  p_request.item,  p_request.quantity,  p_request.unit_cost,  p_request.amount,  p_request.entry_date,  p_request.User,  p_request.measurement,  p_request.request_no,p_budget_items.item_name"
-                                    . " from p_request "
-                                    . " join p_budget_items on p_request.item=p_budget_items.p_budget_items_id "
-                                    . " join main_request on main_request.Main_Request_id=p_request.main_req"
-                                    . "  where p_request.main_req=:activity";
-                            $stmt = $db->prepare($sql);
-                            $stmt->execute(array(":activity" => $mainrequest));
-                            ?>
+    function get_items_by_request($mainrequest) {
+        $database = new dbconnection();
+        $db = $database->openConnection();
+        $sql = "select p_request.p_request_id,  p_request.item,  p_request.quantity,  p_request.unit_cost,  p_request.amount,  p_request.entry_date,  p_request.User,  p_request.measurement,  p_request.request_no,p_budget_items.item_name"
+                . " from p_request "
+                . " join p_budget_items on p_request.item=p_budget_items.p_budget_items_id "
+                . " join main_request on main_request.Main_Request_id=p_request.main_req"
+                . "  where p_request.main_req=:activity";
+        $stmt = $db->prepare($sql);
+        $stmt->execute(array(":activity" => $mainrequest));
+        ?>
                             <script>
                                 $(document).ready(function () {
                                     $('.only_numbers').keyup(function (event) {
@@ -2209,13 +2211,13 @@ class other_fx {
                                             <td class="off">  Amount     </td>
                                             <td>  Supplier     </td>
                                         </tr></thead>
-                                    <?php
-                                    $pages = 1;
-                                    while ($row = $stmt->fetch()) {
-                                        ?><tr> 
+        <?php
+        $pages = 1;
+        while ($row = $stmt->fetch()) {
+            ?><tr> 
                                             <td><?php echo '<input class="only_numbers" name="txt_item" disabled type="text" value="' . $row['item_name'] . '">'; ?>
-                                                <?php echo '<input class="only_numbers" name="txt_itemid[]" type="hidden" value="' . $row['item'] . '">'; ?>
-                                                <?php echo '<input class="only_numbers" name="txt_requestid[]" type="hidden" value="' . $row['p_request_id'] . '">'; ?>
+            <?php echo '<input class="only_numbers" name="txt_itemid[]" type="hidden" value="' . $row['item'] . '">'; ?>
+            <?php echo '<input class="only_numbers" name="txt_requestid[]" type="hidden" value="' . $row['p_request_id'] . '">'; ?>
 
                                             </td>
                                             <td><?php echo '<input class="only_numbers" name="txt_quantity[]" type="text" value="' . number_format($row['quantity']) . '">'; ?></td>
@@ -2224,25 +2226,25 @@ class other_fx {
 
                                             <td class="off"><?php echo '<input class="only_numbers"  type="text" value="' . number_format($row['amount']) . '">"'; ?></td>
                                         </tr>
-                                        <?php
-                                        $pages += 1;
-                                    }
-                                    ?>
+                                            <?php
+                                            $pages += 1;
+                                        }
+                                        ?>
                                     <tr>
                                         <td colspan="3"><input type="submit" class="confirm_buttons push_right btn_save_po" name="send_po" value="Save" style="float: right; margin-right: 0px;" /> </td>
                                     </tr>
                                 </table></form>
-                            <?php
-                        }
+        <?php
+    }
 
-                        function list_p_type_project_excel() {
-                            $database = new dbconnection();
-                            $db = $database->openConnection();
-                            $sql = "select * from p_type_project";
-                            $stmt = $db->prepare($sql);
-                            $stmt->execute();
-                            $output = '';
-                            $output .= '                    
+    function list_p_type_project_excel() {
+        $database = new dbconnection();
+        $db = $database->openConnection();
+        $sql = "select * from p_type_project";
+        $stmt = $db->prepare($sql);
+        $stmt->execute();
+        $output = '';
+        $output .= '                    
             <table class="dataList_table">
                 <thead><tr>
                         <td> S/N </td>
@@ -2250,8 +2252,8 @@ class other_fx {
                         </tr></thead>
                ';
 
-                            while ($row = $stmt->fetch()) {
-                                $output .= '<tr> 
+        while ($row = $stmt->fetch()) {
+            $output .= '<tr> 
 
                         <td>
                               ' . $row['p_type_project_id'] . '
@@ -2261,26 +2263,26 @@ class other_fx {
                         </td>
 
                         </tr>';
-                            }
+        }
 
-                            $output .= '</table>';
-                            header("Content-Type: vnd.ms-excel");
-                            header("Content-Disposition:attachment; filename=excel_out.xls");
-                            header("Pragma: no-cache");
-                            header("Expires: 0");
-                            echo $output;
-                        }
+        $output .= '</table>';
+        header("Content-Type: vnd.ms-excel");
+        header("Content-Disposition:attachment; filename=excel_out.xls");
+        header("Pragma: no-cache");
+        header("Expires: 0");
+        echo $output;
+    }
 
-                        function get_accounts_rec_pay($rec_pay) {
-                            $database = new dbconnection();
-                            $db = $database->openConnection();
-                            $sql = "select account.name as account,account_type.name ,sum(journal_entry_line.amount) as amount from journal_entry_line join account on account.account_id=journal_entry_line.accountid
+    function get_accounts_rec_pay($rec_pay) {
+        $database = new dbconnection();
+        $db = $database->openConnection();
+        $sql = "select account.name as account,account_type.name ,sum(journal_entry_line.amount) as amount from journal_entry_line join account on account.account_id=journal_entry_line.accountid
                             join account_type on account.acc_type=account_type.account_type_id
                             where account_type.name=:type
                             group by account_type.name";
-                            $stmt = $db->prepare($sql);
-                            $stmt->execute(array(":type" => $rec_pay));
-                            ?>
+        $stmt = $db->prepare($sql);
+        $stmt->execute(array(":type" => $rec_pay));
+        ?>
                             <table class="dataList_table">
                                 <thead><tr>
                                         <td> Account </td>
@@ -2289,50 +2291,50 @@ class other_fx {
                                     </tr>
 
                                 </thead>
-                                <?php
-                                $pages = 1;
-                                while ($row = $stmt->fetch()) {
-                                    ?><tr> 
+                            <?php
+                            $pages = 1;
+                            while ($row = $stmt->fetch()) {
+                                ?><tr> 
                                         <td>
-                                            <?php echo $row['account']; ?>
+            <?php echo $row['account']; ?>
                                         </td>
                                         <td class="quantity_id_cols sales_invoice_line " title="sales_invoice_line" >
-                                            <?php echo number_format($this->_e(number_format($row['amount']))); ?>
+            <?php echo number_format($this->_e(number_format($row['amount']))); ?>
                                         </td>
                                     </tr>
                                     <?php
                                     $pages += 1;
                                 }
                                 ?></table>
-                            <?php
-                        }
+                                <?php
+                            }
 
-                        function get_sum_net_borrowing_by_date($min_date, $max_date) {
-                            $database = new dbconnection();
-                            $db = $database->openConnection();
-                            $sql = "select account.name as account,account_type.name ,sum(journal_entry_line.amount) as amount from journal_entry_line
+                            function get_sum_net_borrowing_by_date($min_date, $max_date) {
+                                $database = new dbconnection();
+                                $db = $database->openConnection();
+                                $sql = "select account.name as account,account_type.name ,sum(journal_entry_line.amount) as amount from journal_entry_line
                                         join account on account.account_id=journal_entry_line.accountid
                                         join account_type on account.acc_type=account_type.account_type_id
                                         where account_type.name='account payable' or account_type.name='long term liability' or account_type.name='other current liability' and journal_entry_line.entry_date>=:min_date and journal_entry_line.entry_date<=:max_date
                                             ";
-                            $stmt = $db->prepare($sql);
-                            $stmt->execute(array(":min_date" => $min_date, ":max_date" => $max_date));
-                            $row = $stmt->fetch(PDO::FETCH_ASSOC);
-                            $field = $row['amount'];
-                            return $field;
-                        }
+                                $stmt = $db->prepare($sql);
+                                $stmt->execute(array(":min_date" => $min_date, ":max_date" => $max_date));
+                                $row = $stmt->fetch(PDO::FETCH_ASSOC);
+                                $field = $row['amount'];
+                                return $field;
+                            }
 
-                        function list_sum_net_borrowing_by_date($min_date, $max_date) {
-                            $database = new dbconnection();
-                            $db = $database->openConnection();
-                            $sql = "select account.name as account, account_type.name, journal_entry_line.entry_date,  journal_entry_line.memo,  journal_entry_line.amount  from journal_entry_line
+                            function list_sum_net_borrowing_by_date($min_date, $max_date) {
+                                $database = new dbconnection();
+                                $db = $database->openConnection();
+                                $sql = "select account.name as account, account_type.name, journal_entry_line.entry_date,  journal_entry_line.memo,  journal_entry_line.amount  from journal_entry_line
                                     join account on account.account_id=journal_entry_line.accountid
                                     join account_type on account.acc_type=account_type.account_type_id
                                     where account_type.name='account payable' or account_type.name='long term liability' or account_type.name='other current liability' and journal_entry_line.entry_date>=:min_date and journal_entry_line.entry_date<=:max_date
                                      ";
-                            $stmt = $db->prepare($sql);
-                            $stmt->execute(array(":min_date" => $min_date, ":max_date" => $max_date));
-                            ?><table class="income_table2">
+                                $stmt = $db->prepare($sql);
+                                $stmt->execute(array(":min_date" => $min_date, ":max_date" => $max_date));
+                                ?><table class="income_table2">
                                 <thead class="books_header">
                                     <tr>
                                         <td>Account</td>
@@ -2341,67 +2343,67 @@ class other_fx {
                                         <td>Entry date</td>
                                     </tr>
                                 </thead><?php
-                                while ($row = $stmt->fetch()) {
-                                    ?><tr>
+                            while ($row = $stmt->fetch()) {
+                                ?><tr>
                                         <td><?php echo $row['account'] ?></td>
                                         <td><?php echo number_format($row['amount']); ?></td>
                                         <td><?php echo $row['memo']; ?></td>
                                         <td><?php echo $row['entry_date']; ?></td>
                                     </tr><?php
-                                }
-                            }
+                    }
+                }
 
-                            function get_accounts_cash($rec_pay) {
-                                $database = new dbconnection();
-                                $db = $database->openConnection();
-                                $sql = "select account.name as account,account_type.name ,sum(journal_entry_line.amount) as amount from journal_entry_line join account on account.account_id=journal_entry_line.accountid
+                function get_accounts_cash($rec_pay) {
+                    $database = new dbconnection();
+                    $db = $database->openConnection();
+                    $sql = "select account.name as account,account_type.name ,sum(journal_entry_line.amount) as amount from journal_entry_line join account on account.account_id=journal_entry_line.accountid
                             join account_type on account.acc_type=account_type.account_type_id
                             where account_type.name='bank'
                             group by account_type.name";
-                                $stmt = $db->prepare($sql);
-                                $stmt->execute(array(":type" => $rec_pay));
-                                ?>
+                    $stmt = $db->prepare($sql);
+                    $stmt->execute(array(":type" => $rec_pay));
+                            ?>
                                 <table class="dataList_table">
                                     <thead><tr>
                                             <td> Account </td>
 
                                             <td>  Amount     </td>
                                         </tr></thead>
-                                    <?php
-                                    $pages = 1;
-                                    while ($row = $stmt->fetch()) {
-                                        ?><tr> 
+                                <?php
+                                $pages = 1;
+                                while ($row = $stmt->fetch()) {
+                                    ?><tr> 
 
                                             <td>
-                                                <?php echo $row['account']; ?>
+            <?php echo $row['account']; ?>
                                             </td>
                                             <td class="quantity_id_cols sales_invoice_line " title="sales_invoice_line" >
-                                                <?php echo number_format($this->_e($row['amount'])); ?>
+            <?php echo number_format($this->_e($row['amount'])); ?>
                                             </td>
 
                                         </tr>
 
                                         <?php
-                                        $pages += 1;
-                                    }
-                                    ?></table>
-                                <?php
-                            }
+                                            $pages += 1;
+                                        }
+                                        ?></table>
+                                            <?php
+                                        }
 
-                            function get_on_sales_from_quotation($quotation) {
-                                require_once('../web_db/connection.php');
-                                $database = new dbconnection();
-                                $db = $database->openConnection();
-                                $sql = "select sales_quote_line.sales_quote_line_id,  sales_quote_line.quantity,  sales_quote_line.unit_cost,  sales_quote_line.entry_date,  sales_quote_line.User,  sales_quote_line.amount,  sales_quote_line.measurement,  sales_quote_line.item
+                                        function get_on_sales_from_quotation($quotation) {
+                                            require_once('../web_db/connection.php');
+                                            $database = new dbconnection();
+                                            $db = $database->openConnection();
+                                            $sql = "select sales_quote_line.sales_quote_line_id,  sales_quote_line.quantity,  sales_quote_line.unit_cost,  sales_quote_line.entry_date,  sales_quote_line.User,  sales_quote_line.amount,  sales_quote_line.measurement,  sales_quote_line.item
                             from sales_quote_line  where sales_quote_line_id=:quotation ";
-                                $stmt = $db->prepare($sql);
-                                $stmt->execute(array(":quotation" => $quotation));
-                                ?>
+                                            $stmt = $db->prepare($sql);
+                                            $stmt->execute(array(":quotation" => $quotation));
+                                            ?>
                                 <table class="new_data_table">
                                     <thead><tr><td> sales_quote_line_id </td><td> quantity </td><td> unit_cost </td><td> entry_date </td><td> User </td><td> amount </td><td> measurement </td><td> item </td>
                                         </tr></thead>
 
-                                    <?php while ($row = $stmt->fetch()) { ?><tr> 
+                                <?php while ($row = $stmt->fetch()) { ?><tr> 
                                             <td>        <?php echo $row['sales_quote_line_id']; ?> </td>
                                             <td>        <?php echo $row['quantity']; ?> </td>
                                             <td>        <?php echo $row['unit_cost']; ?> </td>
@@ -2413,15 +2415,15 @@ class other_fx {
 
                                         </tr>
                                     <?php } ?></table>
-                                <?php
-                            }
+                                    <?php
+                                }
 
-                            function get_supplier_sml_combo() {
-                                require_once('../web_db/connection.php');
-                                $database = new dbconnection();
-                                $db = $database->openConnection();
-                                $sql = "select party.party_id ,party.name from party where party.party_type='supplier'";
-                                ?>
+                                function get_supplier_sml_combo() {
+                                    require_once('../web_db/connection.php');
+                                    $database = new dbconnection();
+                                    $db = $database->openConnection();
+                                    $sql = "select party.party_id ,party.name from party where party.party_type='supplier'";
+                                    ?>
                                 <select class="sml_cbo" name="suppliers_cbo[]"><option></option>
                                     <?php
                                     foreach ($db->query($sql) as $row) {
@@ -2537,11 +2539,11 @@ class other_fx {
                                 $sql = "select p_type_project.p_type_project_id,   p_type_project.name from p_type_project";
                                 ?>
                                 <select name="type" class="textbox cbo_type_project fly_new_p_type_project cbo_onfly_p_type_project_change"><option></option> <option value="fly_new_p_type_project">-- Add new --</option> 
-                                    <?php
-                                    foreach ($db->query($sql) as $row) {
-                                        echo "<option value=" . $row['p_type_project_id'] . ">" . $row['name'] . " </option>";
-                                    }
-                                    ?>
+                                <?php
+                                foreach ($db->query($sql) as $row) {
+                                    echo "<option value=" . $row['p_type_project_id'] . ">" . $row['name'] . " </option>";
+                                }
+                                ?>
                                 </select>
                                 <?php
                             }
@@ -2555,11 +2557,11 @@ class other_fx {
                                         . "group by p_budget_items.p_budget_items_id";
                                 ?>
                                 <select name="acc_item_combo[]"  class="textbox cbo_also_rep cbo_items"><option></option> <option valuealso_rep="fly_new_p_budget_items">--Add new--</option>
-                                    <?php
-                                    foreach ($db->query($sql) as $row) {
-                                        echo "<option value=" . $row['item'] . ">" . $row['item_name'] . " </option>";
-                                    }
-                                    ?>
+                                <?php
+                                foreach ($db->query($sql) as $row) {
+                                    echo "<option value=" . $row['item'] . ">" . $row['item_name'] . " </option>";
+                                }
+                                ?>
                                 </select>
                                 <?php
                             }
@@ -2571,12 +2573,12 @@ class other_fx {
                                 $stmt = $db->prepare($sql);
                                 $stmt->execute();
                                 ?>
-                                <?php
-                                $pages = 1;
-                                while ($row = $stmt->fetch()) {
-                                    ?><tr> 
+                                    <?php
+                                    $pages = 1;
+                                    while ($row = $stmt->fetch()) {
+                                        ?><tr> 
                                         <td class="description_id_cols taxgroup " title="taxgroup" >
-                                            <?php echo $this->_e($row['description']); ?>
+                                    <?php echo $this->_e($row['description']); ?>
                                         </td>
 
                                         <td class="">
@@ -2587,19 +2589,19 @@ class other_fx {
                                     $pages += 1;
                                 }
                                 ?>
-                                <?php
-                            }
+                                        <?php
+                                    }
 
-                            function list_account_toenable_disable() {
-                                $database = new dbconnection();
-                                $db = $database->openConnection();
-                                $sql = "select account_id, account.name, account_type.name as type, sum(journal_entry_line.amount) as amount from account "
-                                        . " join account_type on account.acc_type=account_type.account_type_id "
-                                        . " left join journal_entry_line on journal_entry_line.accountid =account.account_id "
-                                        . " group by account.name order by amount desc ";
-                                $stmt = $db->prepare($sql);
-                                $stmt->execute();
-                                ?>
+                                    function list_account_toenable_disable() {
+                                        $database = new dbconnection();
+                                        $db = $database->openConnection();
+                                        $sql = "select account_id, account.name, account_type.name as type, sum(journal_entry_line.amount) as amount from account "
+                                                . " join account_type on account.acc_type=account_type.account_type_id "
+                                                . " left join journal_entry_line on journal_entry_line.accountid =account.account_id "
+                                                . " group by account.name order by amount desc ";
+                                        $stmt = $db->prepare($sql);
+                                        $stmt->execute();
+                                        ?>
 
                                 <?php
                                 $c = 0;
@@ -2631,20 +2633,20 @@ class other_fx {
                                             <td> Confirm </td>
                                             <td class="off"> Tax Applied </td>
                                             <td class="off"> Is Active </td>
-                                            <?php if (isset($_SESSION['shall_delete'])) { ?><td>Delete</td><td>Update</td><?php } ?></tr></thead>
+                                <?php if (isset($_SESSION['shall_delete'])) { ?><td>Delete</td><td>Update</td><?php } ?></tr></thead>
 
-                                    <?php
-                                    $pages = 1;
-                                    while ($row = $stmt->fetch()) {
-                                        ?><tr> 
+                                <?php
+                                $pages = 1;
+                                while ($row = $stmt->fetch()) {
+                                    ?><tr> 
                                             <td>
-                                                <?php echo $row['taxgroup_id']; ?>
+            <?php echo $row['taxgroup_id']; ?>
                                             </td>
                                             <td class="description_id_cols taxgroup tax_label_col" data-bind="<?php echo $row['taxgroup_id']; ?>" title="taxgroup"  >
-                                                <?php echo $this->_e($row['description']); ?>
+            <?php echo $this->_e($row['description']); ?>
                                             </td>
                                             <td title="taxgroup" >
-                                                <?php echo $this->_e($row['pur_sale']); ?>
+                                        <?php echo $this->_e($row['pur_sale']); ?>
                                             </td>
                                             <td class="value_td" value="400">
                                                 <input type="text" class="textbox" />
@@ -2658,71 +2660,71 @@ class other_fx {
                                             <td class="off">
                                                 <?php echo $this->_e($row['is_active']); ?>
                                             </td>
-                                            <?php if (isset($_SESSION['shall_delete'])) { ?>
+            <?php if (isset($_SESSION['shall_delete'])) { ?>
                                                 <td>
                                                     <a href="#" class="taxgroup_delete_link" style="color: #000080;" value="
-                                                       <?php echo $row['taxgroup_id']; ?>">Delete</a>
+                <?php echo $row['taxgroup_id']; ?>">Delete</a>
                                                 </td>
                                                 <td>
                                                     <a href="#" class="taxgroup_update_link" style="color: #000080;" value="
-                                                       <?php echo $row['taxgroup_id']; ?>">Update</a>
+                                                    <?php echo $row['taxgroup_id']; ?>">Update</a>
                                                 </td><?php } ?></tr>
-                                        <?php
-                                        $pages += 1;
-                                    }
-                                    ?></table>
-                                    <?php
-                                }
+                                                <?php
+                                                $pages += 1;
+                                            }
+                                            ?></table>
+        <?php
+    }
 
-                                function get_tax_formula_exits($tax) {
-                                    try {
-                                        $con = new dbconnection();
-                                        $db = $con->openconnection();
-                                        $sql = "select tax_calculations.tax_calculations_id from tax_calculations"
-                                                . " where tax_calculations.tax=:tax ";
-                                        $stmt = $db->prepare($sql);
-                                        $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-                                        $stmt->execute(array(":tax" => $tax));
-                                        $row = $stmt->fetch(PDO::FETCH_ASSOC);
-                                        $field = $row['tax_calculations_id'];
-                                        return $field;
-                                    } catch (PDOException $e) {
-                                        echo $e->getMessage();
-                                    }
-                                }
+    function get_tax_formula_exits($tax) {
+        try {
+            $con = new dbconnection();
+            $db = $con->openconnection();
+            $sql = "select tax_calculations.tax_calculations_id from tax_calculations"
+                    . " where tax_calculations.tax=:tax ";
+            $stmt = $db->prepare($sql);
+            $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $stmt->execute(array(":tax" => $tax));
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            $field = $row['tax_calculations_id'];
+            return $field;
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+        }
+    }
 
-                                function get_total_tax_on_pur_sale_by_date($date1, $date2, $pur_sale) {// this function calculates the total tax on purchase or on sale
-                                    try {
-                                        $con = new dbconnection();
-                                        $db = $con->openconnection();
-                                        $sql = "select sum(tax_percentage.amount) as tot_tax from tax_percentage
+    function get_total_tax_on_pur_sale_by_date($date1, $date2, $pur_sale) {// this function calculates the total tax on purchase or on sale
+        try {
+            $con = new dbconnection();
+            $db = $con->openconnection();
+            $sql = "select sum(tax_percentage.amount) as tot_tax from tax_percentage
                                 join purchase_invoice_line on purchase_invoice_line.purchase_invoice_line_id=tax_percentage.purid_saleid
                                 where tax_percentage.pur_sale=:pur_sale and purchase_invoice_line.entry_date>=:min_date and purchase_invoice_line.entry_date<=:max_date ";
-                                        $stmt = $db->prepare($sql);
-                                        $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-                                        $stmt->execute(array(":min_date" => $date1, ':max_date' => $date2, ':pur_sale' => $pur_sale));
-                                        $row = $stmt->fetch(PDO::FETCH_ASSOC);
-                                        $field = $row['tot_tax'];
-                                        return $field;
-                                    } catch (PDOException $e) {
-                                        echo $e->getMessage();
-                                    }
-                                }
+            $stmt = $db->prepare($sql);
+            $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $stmt->execute(array(":min_date" => $date1, ':max_date' => $date2, ':pur_sale' => $pur_sale));
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            $field = $row['tot_tax'];
+            return $field;
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+        }
+    }
 
-                                function list_tax_percentage($min) {
-                                    $database = new dbconnection();
-                                    $db = $database->openConnection();
-                                    $sql = "select * from tax_percentage";
-                                    $stmt = $db->prepare($sql);
-                                    $stmt->execute(array(":min" => $min));
-                                    ?>
+    function list_tax_percentage($min) {
+        $database = new dbconnection();
+        $db = $database->openConnection();
+        $sql = "select * from tax_percentage";
+        $stmt = $db->prepare($sql);
+        $stmt->execute(array(":min" => $min));
+        ?>
                                 <table class="dataList_table">
                                     <thead><tr>
 
                                             <td> S/N </td>
                                             <td> Purchase or Sale </td>
                                             <td> Percentage </td><td> Purchaseid Sale id </td>
-                                            <?php if (isset($_SESSION['shall_delete'])) { ?> <td>Delete</td><td>Update</td><?php } ?></tr></thead>
+                                    <?php if (isset($_SESSION['shall_delete'])) { ?> <td>Delete</td><td>Update</td><?php } ?></tr></thead>
 
                                     <?php
                                     $pages = 1;
@@ -2730,124 +2732,124 @@ class other_fx {
                                         ?><tr> 
 
                                             <td>
-                                                <?php echo $row['tax_percentage_id']; ?>
+            <?php echo $row['tax_percentage_id']; ?>
                                             </td>
                                             <td class="pur_sale_id_cols tax_percentage " title="tax_percentage" >
                                                 <?php echo $this->_e($row['pur_sale']); ?>
                                             </td>
                                             <td>
-                                                <?php echo $this->_e($row['percentage']) . '%'; ?>
+                                        <?php echo $this->_e($row['percentage']) . '%'; ?>
                                             </td>
                                             <td>
-                                                <?php echo $this->_e($row['purid_saleid']); ?>
+                                        <?php echo $this->_e($row['purid_saleid']); ?>
                                             </td>
 
-                                            <?php if (isset($_SESSION['shall_delete'])) { ?>   <td>
+                                                <?php if (isset($_SESSION['shall_delete'])) { ?>   <td>
                                                     <a href="#" class="tax_percentage_delete_link" style="color: #000080;" data-id_delete="tax_percentage_id"  data-table="
-                                                       <?php echo $row['tax_percentage_id']; ?>">Delete</a>
+                                                    <?php echo $row['tax_percentage_id']; ?>">Delete</a>
                                                 </td>
                                                 <td>
                                                     <a href="#" class="tax_percentage_update_link" style="color: #000080;" value="
-                                                       <?php echo $row['tax_percentage_id']; ?>">Update</a>
+                                                    <?php echo $row['tax_percentage_id']; ?>">Update</a>
                                                 </td><?php } ?></tr>
+                                                <?php
+                                                $pages += 1;
+                                            }
+                                            ?></table>
                                         <?php
-                                        $pages += 1;
                                     }
-                                    ?></table>
+
+//chosen individual field
+                                    function get_chosen_tax_percentage_pur_sale($id) {
+
+                                        $db = new dbconnection();
+                                        $sql = "select   tax_percentage.pur_sale from tax_percentage where tax_percentage_id=:tax_percentage_id ";
+                                        $stmt = $db->openConnection()->prepare($sql);
+                                        $stmt->bindValue(':tax_percentage_id', $id);
+                                        $stmt->execute();
+                                        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+                                        $field = $row['pur_sale'];
+                                        echo $field;
+                                    }
+
+                                    function get_chosen_tax_percentage_percentage($id) {
+
+                                        $db = new dbconnection();
+                                        $sql = "select   tax_percentage.percentage from tax_percentage where tax_percentage_id=:tax_percentage_id ";
+                                        $stmt = $db->openConnection()->prepare($sql);
+                                        $stmt->bindValue(':tax_percentage_id', $id);
+                                        $stmt->execute();
+                                        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+                                        $field = $row['percentage'];
+                                        echo $field;
+                                    }
+
+                                    function get_chosen_tax_percentage_purid_saleid($id) {
+
+                                        $db = new dbconnection();
+                                        $sql = "select   tax_percentage.purid_saleid from tax_percentage where tax_percentage_id=:tax_percentage_id ";
+                                        $stmt = $db->openConnection()->prepare($sql);
+                                        $stmt->bindValue(':tax_percentage_id', $id);
+                                        $stmt->execute();
+                                        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+                                        $field = $row['purid_saleid'];
+                                        echo $field;
+                                    }
+
+                                    function All_tax_percentage() {
+                                        $c = 0;
+                                        $database = new dbconnection();
+                                        $db = $database->openConnection();
+                                        $sql = "select  tax_percentage_id   from tax_percentage";
+                                        foreach ($db->query($sql) as $row) {
+                                            $c += 1;
+                                        }
+                                        return $c;
+                                    }
+
+                                    function get_first_tax_percentage() {
+                                        $con = new dbconnection();
+                                        $sql = "select tax_percentage.tax_percentage_id from tax_percentage
+                                                order by tax_percentage.tax_percentage_id asc
+                                                limit 1";
+                                        $stmt = $con->openconnection()->prepare($sql);
+                                        $stmt->execute();
+                                        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+                                        $first_rec = $row['tax_percentage_id'];
+                                        return $first_rec;
+                                    }
+
+                                    function get_last_tax_percentage() {
+                                        $con = new dbconnection();
+                                        $sql = "select tax_percentage.tax_percentage_id from tax_percentage
+                    order by tax_percentage.tax_percentage_id desc
+                    limit 1";
+                                        $stmt = $con->openconnection()->prepare($sql);
+                                        $stmt->execute();
+                                        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+                                        $first_rec = $row['tax_percentage_id'];
+                                        return $first_rec;
+                                    }
+
+                                    function get_vatid_in_combo() {
+                                        require_once('../web_db/connection.php');
+                                        $database = new dbconnection();
+                                        $db = $database->openConnection();
+                                        $sql = "select vatid.vatid_id,   vatid.name from vatid";
+                                        ?>
+                                <select class="textbox cbo_vatid"><option></option>
+                                    <?php
+                                    foreach ($db->query($sql) as $row) {
+                                        echo "<option value=" . $row['vatid_id'] . ">" . $row['name'] . " </option>";
+                                    }
+                                    ?>
+                                </select>
                                     <?php
                                 }
 
-//chosen individual field
-                                function get_chosen_tax_percentage_pur_sale($id) {
-
-                                    $db = new dbconnection();
-                                    $sql = "select   tax_percentage.pur_sale from tax_percentage where tax_percentage_id=:tax_percentage_id ";
-                                    $stmt = $db->openConnection()->prepare($sql);
-                                    $stmt->bindValue(':tax_percentage_id', $id);
-                                    $stmt->execute();
-                                    $row = $stmt->fetch(PDO::FETCH_ASSOC);
-                                    $field = $row['pur_sale'];
-                                    echo $field;
+                                function _e($string) {
+                                    echo htmlspecialchars($string, ENT_QUOTES, 'UTF-8');
                                 }
 
-                                function get_chosen_tax_percentage_percentage($id) {
-
-                                    $db = new dbconnection();
-                                    $sql = "select   tax_percentage.percentage from tax_percentage where tax_percentage_id=:tax_percentage_id ";
-                                    $stmt = $db->openConnection()->prepare($sql);
-                                    $stmt->bindValue(':tax_percentage_id', $id);
-                                    $stmt->execute();
-                                    $row = $stmt->fetch(PDO::FETCH_ASSOC);
-                                    $field = $row['percentage'];
-                                    echo $field;
-                                }
-
-                                function get_chosen_tax_percentage_purid_saleid($id) {
-
-                                    $db = new dbconnection();
-                                    $sql = "select   tax_percentage.purid_saleid from tax_percentage where tax_percentage_id=:tax_percentage_id ";
-                                    $stmt = $db->openConnection()->prepare($sql);
-                                    $stmt->bindValue(':tax_percentage_id', $id);
-                                    $stmt->execute();
-                                    $row = $stmt->fetch(PDO::FETCH_ASSOC);
-                                    $field = $row['purid_saleid'];
-                                    echo $field;
-                                }
-
-                                function All_tax_percentage() {
-                                    $c = 0;
-                                    $database = new dbconnection();
-                                    $db = $database->openConnection();
-                                    $sql = "select  tax_percentage_id   from tax_percentage";
-                                    foreach ($db->query($sql) as $row) {
-                                        $c += 1;
-                                    }
-                                    return $c;
-                                }
-
-                                function get_first_tax_percentage() {
-                                    $con = new dbconnection();
-                                    $sql = "select tax_percentage.tax_percentage_id from tax_percentage
-                    order by tax_percentage.tax_percentage_id asc
-                    limit 1";
-                                    $stmt = $con->openconnection()->prepare($sql);
-                                    $stmt->execute();
-                                    $row = $stmt->fetch(PDO::FETCH_ASSOC);
-                                    $first_rec = $row['tax_percentage_id'];
-                                    return $first_rec;
-                                }
-
-                                function get_last_tax_percentage() {
-                                    $con = new dbconnection();
-                                    $sql = "select tax_percentage.tax_percentage_id from tax_percentage
-                    order by tax_percentage.tax_percentage_id desc
-                    limit 1";
-                                    $stmt = $con->openconnection()->prepare($sql);
-                                    $stmt->execute();
-                                    $row = $stmt->fetch(PDO::FETCH_ASSOC);
-                                    $first_rec = $row['tax_percentage_id'];
-                                    return $first_rec;
-                                }
-
-                                function get_vatid_in_combo() {
-                                    require_once('../web_db/connection.php');
-                                    $database = new dbconnection();
-                                    $db = $database->openConnection();
-                                    $sql = "select vatid.vatid_id,   vatid.name from vatid";
-                                    ?>
-                                <select class="textbox cbo_vatid"><option></option>
-                                        <?php
-                                        foreach ($db->query($sql) as $row) {
-                                            echo "<option value=" . $row['vatid_id'] . ">" . $row['name'] . " </option>";
-                                        }
-                                        ?>
-                                </select>
-                                <?php
                             }
-
-                            function _e($string) {
-                                echo htmlspecialchars($string, ENT_QUOTES, 'UTF-8');
-                            }
-
-                        }
-                        
+                            
