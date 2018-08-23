@@ -876,10 +876,7 @@
 
             function list_sum_income_or_expenses($inc_exp,$min_date,$max_date) {
                 $db = new dbconnection();
-                $sql = "select account.name as account,  account.account_id, journal_entry_line.amount as amount ,journal_entry_line.entry_date, journal_entry_line.memo  from account
-                            join journal_entry_line on journal_entry_line.accountid=account.account_id
-                            join account_type on account.acc_type=account_type.account_type_id 
-                            where account_type.name='income'"
+                $sql = "select account.name as account, account.account_id, journal_entry_line.amount as amount ,journal_entry_line.entry_date, journal_entry_line.memo from account join journal_entry_line on journal_entry_line.accountid=account.account_id join account_type on account.acc_type=account_type.account_type_id where account_type.name=:name and journal_entry_line.entry_date>=:min_date  and journal_entry_line.entry_date<=:max_date"
                             ;
                 $stmt = $db->openConnection()->prepare($sql);
                $stmt->execute(array(":name"=>$inc_exp,":min_date" => $min_date, ":max_date" => $max_date));
@@ -1170,7 +1167,7 @@
                             $sql = "select  sum(journal_entry_line.amount) as amount from account               
                                 join journal_entry_line on journal_entry_line.accountid=account.account_id
                                 join account_type on account.acc_type=account_type.account_type_id   
-                                where account_type.name='Cost Of Good Sold'  and journal_entry_line.entry_date>=:min_date and journal_entry_line.entry_date<=:max_date
+                                where account_type.name='Cost Of Good Sold' and journal_entry_line.entry_date>=:min_date and journal_entry_line.entry_date<=:max_date
                                 group by account_type.account_type_id ";
                             $stmt = $db->openConnection()->prepare($sql);
                             $stmt->execute(array(":min_date" => $min_date, ":max_date" => $max_date));
@@ -1184,11 +1181,11 @@
 
                     function list_cogs_by_date($min_date, $max_date) {
                         $db = new dbconnection();
-                        $sql = "select account.name as account,journal_entry_line.memo,journal_entry_line.entry_date,  sum(journal_entry_line.amount) as amount from account               
+                        $sql = "select account.name as account,journal_entry_line.memo,journal_entry_line.entry_date,  journal_entry_line.amount as amount from account               
                                 join journal_entry_line on journal_entry_line.accountid=account.account_id
                                 join account_type on account.acc_type=account_type.account_type_id   
                                 where account_type.name='Cost Of Good Sold'  and journal_entry_line.entry_date>=:min_date and journal_entry_line.entry_date<=:max_date
-                                group by account_type.account_type_id ";
+                                 ";
                         $stmt = $db->openConnection()->prepare($sql);
                         $stmt->execute(array(":min_date" => $min_date, ":max_date" => $max_date));
                         ?><table class="income_table2 full_center_two_h heit_free"><thead class="books_header">
@@ -1216,6 +1213,9 @@
                                 join journal_entry_line on journal_entry_line.accountid=account.account_id
                                 join account_type on account.acc_type=account_type.account_type_id   
                                 where account_type.name='Other Expense'  and journal_entry_line.entry_date>=:min_date and journal_entry_line.entry_date<=:max_date ";
+                      
+
+
                         $stmt = $db->openConnection()->prepare($sql);
                         $stmt->execute(array(":min_date" => $min_date, ":max_date" => $max_date));
                         ?><table class="income_table2"><thead class="books_header">
@@ -1294,7 +1294,7 @@
 
                             function get_sum_acc_rec_by_date($min_date, $max_date) {
                                 $db = new dbconnection();
-                                $sql = "select account.name as account,  sum(journal_entry_line.amount) as amount from account               
+                                $sql = "select   sum(journal_entry_line.amount) as amount from account               
                  join journal_entry_line on journal_entry_line.accountid=account.account_id
                  join account_type on account.acc_type=account_type.account_type_id   
                  where account_type.name='account receivable'  and journal_entry_line.entry_date>=:min_date and journal_entry_line.entry_date<=:max_date
@@ -1419,10 +1419,10 @@
 
                             function get_sum_acc_pay_by_date($min_date, $max_date) {// these are the prepaid expenses
                                 $db = new dbconnection();
-                                $sql = "select account.name as account,  sum(journal_entry_line.amount) as amount from account               
+                                $sql = "select  sum(journal_entry_line.amount) as amount from account               
                                         join journal_entry_line on journal_entry_line.accountid=account.account_id
                                         join account_type on account.acc_type=account_type.account_type_id   
-                                        where account_type.name='account payable'  and journal_entry_line.entry_date>=:min_date and journal_entry_line.entry_date<=:max_date
+                                        where account_type.name='Accounts payable'   and journal_entry_line.entry_date>=:min_date and journal_entry_line.entry_date<=:max_date
                                         group by account_type.account_type_id ";
                                 $stmt = $db->openConnection()->prepare($sql);
                                 $stmt->execute(array(":min_date" => $min_date, ":max_date" => $max_date));
@@ -1433,11 +1433,11 @@
 
                             function list_acc_pay_by_date($min_date, $max_date) {// these are the prepaid expenses
                                 $db = new dbconnection();
-                                $sql = "select account.name as account,  sum(journal_entry_line.amount) as amount from account               
+                                $sql = "select account.name as account,  journal_entry_line.amount as amount ,journal_entry_line.entry_date from account               
                                 join journal_entry_line on journal_entry_line.accountid=account.account_id
                                 join account_type on account.acc_type=account_type.account_type_id   
-                                where account_type.name='Account Payable'  and journal_entry_line.entry_date>=:min_date and journal_entry_line.entry_date<=:max_date
-                                group by account_type.account_type_id ";
+                                where account_type.name='Accounts Payable'  and journal_entry_line.entry_date>=:min_date and journal_entry_line.entry_date<=:max_date
+                                 ";
                                 $stmt = $db->openConnection()->prepare($sql);
                                 $stmt->execute(array(":min_date" => $min_date, ":max_date" => $max_date));
                                 ?><table class="income_table2 out_border">
@@ -1445,13 +1445,14 @@
                                         <tr>
                                             <td>Account </td>
                                             <td>Amount </td>
-                                            <td>Amount </td>
+                                            <td>Entry Date </td>
                                         </tr> 
                                     </thead> <?php
                                     while ($row = $stmt->fetch()) {
                                         ?><tr>
                                             <td><?php echo $row['account'] ?></td>
                                             <td><?php echo number_format($row['amount']) ?></td>
+                                            <td><?php echo $row['entry_date'] ?></td>
                                         </tr><?php
                                     }
                                     ?></table><?php
@@ -1473,11 +1474,12 @@
 
                             function list_acrued_exp_by_date($min_date, $max_date) {// these are the prepaid expenses
                                 $db = new dbconnection();
-                                $sql = "select account.name as account,  sum(journal_entry_line.amount) as amount from account               
+                                $sql = "select account.name as account,journal_entry_line.amount as amount from account               
                                 join journal_entry_line on journal_entry_line.accountid=account.account_id
                                 join account_type on account.acc_type=account_type.account_type_id   
                                 where account_type.name='expense' and  account.name='accrued expense'  and journal_entry_line.entry_date>=:min_date and journal_entry_line.entry_date<=:max_date
-                                group by account_type.account_type_id ";
+                                group by account_type.account_type_id 
+                                 ";
                                 $stmt = $db->openConnection()->prepare($sql);
                                 $stmt->execute(array(":min_date" => $min_date, ":max_date" => $max_date));
                                 ?><table class="income_table2 out_border">
@@ -1516,11 +1518,11 @@
 
                             function list_currentportion_by_date($min_date, $max_date) {// these are the prepaid expenses
                                 $db = new dbconnection();
-                                $sql = "select account.name as account,journal_entry_line.entry_date,journal_entry_line.memo,  sum(journal_entry_line.amount) as amount from account               
+                                $sql = "select account.name as account,journal_entry_line.entry_date,journal_entry_line.memo,  journal_entry_line.amount as amount from account               
                                 join journal_entry_line on journal_entry_line.accountid=account.account_id
                                 join account_type on account.acc_type=account_type.account_type_id   
                                 where account_type.name='other current liability'   and journal_entry_line.entry_date>=:min_date and journal_entry_line.entry_date<=:max_date
-                                group by account_type.account_type_id ";
+                             ";
                                 $stmt = $db->openConnection()->prepare($sql);
                                 $stmt->execute(array(":min_date" => $min_date, ":max_date" => $max_date));
                                 ?><table class="income_table2 out_border">
@@ -1586,7 +1588,7 @@
 
                             function get_sum_acrud_exp_by_date($min_date, $max_date) {// these are the prepaid expenses
                                 $db = new dbconnection();
-                                $sql = "select account.name as account,  sum(journal_entry_line.amount) as amount from account               
+                                $sql = "select   sum(journal_entry_line.amount) as amount from account               
                  join journal_entry_line on journal_entry_line.accountid=account.account_id
                  join account_type on account.acc_type=account_type.account_type_id   
                  where account.name='accrued expenses'  and journal_entry_line.entry_date>=:min_date and journal_entry_line.entry_date<=:max_date
@@ -1619,7 +1621,7 @@
 
                             function get_sum_current_debt_by_date($min_date, $max_date) {// these are the prepaid expenses
                                 $db = new dbconnection();
-                                $sql = "select account.name as account,  sum(journal_entry_line.amount) as amount from account               
+                                $sql = "select  sum(journal_entry_line.amount) as amount from account               
                                 join journal_entry_line on journal_entry_line.accountid=account.account_id
                                 join account_type on account.acc_type=account_type.account_type_id   
                                 where account_type.name='other current liability'  and journal_entry_line.entry_date>=:min_date and journal_entry_line.entry_date<=:max_date
@@ -1652,7 +1654,7 @@
 
                             function get_sum_longterm_debt_by_date($min_date, $max_date) {// these are the prepaid expenses
                                 $db = new dbconnection();
-                                $sql = "select account.name as account,  sum(journal_entry_line.amount) as amount from account               
+                                $sql = "select  sum(journal_entry_line.amount) as amount from account               
                  join journal_entry_line on journal_entry_line.accountid=account.account_id
                  join account_type on account.acc_type=account_type.account_type_id   
                  where account_type.name='long term liability'  and journal_entry_line.entry_date>=:min_date and journal_entry_line.entry_date<=:max_date
@@ -1666,11 +1668,11 @@
 
                             function list_longterm_debt_by_date($min_date, $max_date) {// these are the prepaid expenses
                                 $db = new dbconnection();
-                                $sql = "select account.name as account,journal_entry_line.entry_date,journal_entry_line.memo,  sum(journal_entry_line.amount) as amount from account               
+                                $sql = "select account.name as account,journal_entry_line.entry_date,journal_entry_line.memo,  journal_entry_line.amount as amount from account               
                             join journal_entry_line on journal_entry_line.accountid=account.account_id
                             join account_type on account.acc_type=account_type.account_type_id   
                             where account_type.name='long term liability'  and journal_entry_line.entry_date>=:min_date and journal_entry_line.entry_date<=:max_date
-                            group by account_type.account_type_id ";
+                            ";
                                 $stmt = $db->openConnection()->prepare($sql);
                                 $stmt->execute(array(":min_date" => $min_date, ":max_date" => $max_date));
                                 ?><table class="income_table2 out_border">
@@ -1733,10 +1735,10 @@
                             function get_sum_retained_earn_by_date($min_date, $max_date) {// these are the prepaid expenses
                                 $db = new dbconnection();
                                 $sql = "select account.name as account,  sum(journal_entry_line.amount) as amount from account               
-                 join journal_entry_line on journal_entry_line.accountid=account.account_id
-                 join account_type on account.acc_type=account_type.account_type_id   
-                 where account.name='retained earnings'  and journal_entry_line.entry_date>=:min_date and journal_entry_line.entry_date<=:max_date
-                 group by account_type.account_type_id ";
+                                 join journal_entry_line on journal_entry_line.accountid=account.account_id
+                                 join account_type on account.acc_type=account_type.account_type_id   
+                                 where account.name='retained earnings'  and journal_entry_line.entry_date>=:min_date and journal_entry_line.entry_date<=:max_date
+                                 group by account_type.account_type_id ";
                                 $stmt = $db->openConnection()->prepare($sql);
                                 $stmt->execute(array(":min_date" => $min_date, ":max_date" => $max_date));
                                 $row = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -1746,15 +1748,20 @@
 
                             function list_retained_earn_by_date($min_date, $max_date) {// these are the prepaid expenses
                                 $db = new dbconnection();
-                                $sql = "select account.name as account,  sum(journal_entry_line.amount) as amount from account               
+                                $sql = "select account.name as account,  journal_entry_line.amount as amount from account               
                  join journal_entry_line on journal_entry_line.accountid=account.account_id
                  join account_type on account.acc_type=account_type.account_type_id   
                  where account.name='retained earnings'  and journal_entry_line.entry_date>=:min_date and journal_entry_line.entry_date<=:max_date
-                 group by account_type.account_type_id ";
+                  ";
                                 $stmt = $db->openConnection()->prepare($sql);
                                 $stmt->execute(array(":min_date" => $min_date, ":max_date" => $max_date));
                                 ?><table class="income_table2"><tr>
-                                        <td colspan="2"> </td><tr><?php
+                                        <td colspan="2"><tr>
+                                            <td>Account </td>
+                                            <td>Amount </td>
+                                            <td>Memo </td>
+                                            <td>Entry date </td>
+                                        <tr></thead> </td><tr><?php
                                             while ($row = $stmt->fetch()) {
                                                 ?><tr>
                                             <td><?php echo $row['account'] ?></td>
