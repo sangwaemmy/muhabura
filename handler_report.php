@@ -186,6 +186,18 @@
         $max_date = $other->get_this_year_end_date();
         $other->list_capital_stock_by_date($min_date, $max_date);
     }
+
+
+if (filter_has_var(INPUT_POST, 'inc_retained_earn')) {
+        require_once '../web_db/multi_values.php';
+        require_once '../web_db/other_fx.php';
+        $obj = new multi_values();
+        $other = new other_fx();
+        $min_date = $other->get_this_year_start_date();
+        $max_date = $other->get_this_year_end_date();
+        $other->list_retained_earn_by_date($min_date, $max_date);
+    }
+    
     if (filter_has_var(INPUT_POST, 'inc_inventory')) {
         require_once '../web_db/multi_values.php';
         require_once '../web_db/other_fx.php';
@@ -310,7 +322,7 @@
         $other = new other_fx();
         $min_date = $other->get_this_year_start_date();
         $max_date = $other->get_this_year_end_date();
-        $other->list_sum_income_or_expenses('income');
+        $other->list_sum_income_or_expenses('income',$min_date ,$max_date);
     }
 
     if (filter_has_var(INPUT_POST, 'balnc_cogs')) {
@@ -340,8 +352,11 @@
         $min_date = $other->get_this_year_start_date();
         $max_date = $other->get_this_year_end_date();
         $other->list_research_dev_by_date($min_date, $max_date);
+
+
+
     }
-    if (filter_has_var(INPUT_POST, 'balnc_gen_exp')) {
+    if (filter_has_var(INPUT_POST, 'balnc_gen_explist_gen_expe_by_date')) {
         require_once '../web_db/multi_values.php';
         require_once '../web_db/other_fx.php';
         $obj = new multi_values();
@@ -376,6 +391,11 @@
         $max_date = $other->get_this_year_end_date();
         $other->list_sales_stock_by_date($min_date, $max_date);
     }
+
+
+
+
+
 
     if (filter_has_var(INPUT_POST, 'full_book_income_statement')) {
         require_once '../web_db/Reports.php';

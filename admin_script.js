@@ -9,6 +9,8 @@ var end_date = '';
 
 
 
+// 
+
 
 //</editor-fold>
 var fin_res = '';//this is the fincial results that come when someone has clicked the income statement of balance sheet or the cash flow
@@ -856,7 +858,7 @@ function financial_details() {
             fin_res = data;
         }).complete(function () {
             $('.load_gif').hide(5, function () {
-                $('.fin_data_res  ').html(fin_res);
+                $('.fin_data_res').html(fin_res);
             });
         });
     });
@@ -926,6 +928,19 @@ function financial_details() {
             });
         });
     });
+
+$('.balnc_gen_explist_gen_expe_by_date').click(function () {
+        var balnc_gen_explist_gen_expe_by_date = 'c';
+        $('.rep_title').html('Income tax');
+        $.post('handler_report.php', {balnc_gen_explist_gen_expe_by_date: balnc_gen_explist_gen_expe_by_date}, function (data) {
+            fin_res = data;
+        }).complete(function () {
+            $('.load_gif').hide(5, function () {
+                $('.fin_data_res  ').html(fin_res);
+            });
+        });
+    });
+// 
 
 
     //Balance sheet
@@ -1090,6 +1105,24 @@ function financial_details() {
     });
 
 
+
+
+ $('.inc_retained_earn').click(function () {
+        var inc_retained_earn = 'c';
+        $('.fin_data_res').html('');
+        $('.rep_title').html('Retained Earnings');
+        $.post('handler_report.php', {inc_retained_earn: inc_retained_earn}, function (data) {
+            fin_res = data;
+        }).complete(function () {
+            $('.load_gif').hide(5, function () {
+                $('.fin_data_res').html(fin_res);
+            });
+        });
+    });
+
+// 
+
+
 //    Cash flow
     $('.ch_fl_cash').click(function () {
         var ch_fl_cash = 'c';
@@ -1216,19 +1249,23 @@ function Retrieve_date() {//this is tp ge the date present in the textboxes once
         var date2 = $('#date2').val();
         var bind = $(this).data('bind');
         if (bind == 'incm') {//This is the income statement
-            the_rep_dates = 'income';
+            the_rep_check = 'income';
         } else if (bind == 'blns') {//This is the balance sheet
             the_rep_dates = 'balance';
         } else if (bind == 'cshfl') {//This is the cash flow
             the_rep_dates = 'cash';
         }
+
+       
+
+        
         $.post('handler_report.php', {the_rep_dates: the_rep_dates, date1: date1, date2: date2}, function (data) {
 //            alert('The dates changed: ' + data);
         }).complete(function () {
             
             window.location.reload();
         });
-
+          
 
     });
 }
